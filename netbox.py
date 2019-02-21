@@ -24,7 +24,7 @@ valid_ssh_key_types = [
 ]
 
 # Interface attributes we care about...
-interface_attrs = ['mac_address', 'mtu', 'name', 'tagged_vlans', 'untagged_vlan', 'description']
+interface_attrs = ['mac_address', 'mtu', 'name', 'tagged_vlans', 'untagged_vlan', 'description', 'lag']
 # ... and there names for us
 interface_attr_map = {
 	'mac_address' : 'mac',
@@ -231,6 +231,8 @@ class Netbox (object):
 
 				iface[our_key] = iface_config[key]
 
+		self._update_bonding_config (ifaces)
+
 		return ifaces
 
 
@@ -258,3 +260,24 @@ class Netbox (object):
 				iface['vrf'] = addr_info['vrf']
 
 		return ifaces
+
+	def _update_bonding_config (self, interfaces):
+		bonds = {}
+
+		for ifname, iface_config in interfaces.items ():
+			lag_config = iface_config.get ('lag', None)
+			if not lag_config:
+				continue
+
+			lag = lag_config['name']
+			if lag not in bonds:
+				bonds[lag] = []
+
+			bonds[lag].append (ifname)
+
+		for bond in bonds:
+			interfaces[bond]['bond-salves'] = ",".join (bonds[bond])
+
+			# On Linux we don't need interface config stazas for bond members
+			for member in bonds[bond]:
+				del interfaces[member]
