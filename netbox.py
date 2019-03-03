@@ -280,7 +280,7 @@ class Netbox (object):
 			bonds[lag].append (ifname)
 
 		for bond in bonds:
-			interfaces[bond]['bond-salves'] = ",".join (bonds[bond])
+			interfaces[bond]['bond-slaves'] = " ".join (sorted (bonds[bond]))
 
 			# On Linux we don't need interface config stazas for bond members
 			for member in bonds[bond]:
