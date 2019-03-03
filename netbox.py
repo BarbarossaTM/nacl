@@ -216,6 +216,10 @@ class Netbox (object):
 		for iface_config in res:
 			ifname = iface_config['name']
 
+			# Ignore interfaces which are not enabled
+			if not iface_config.get ('enabled', False):
+				continue
+
 			ifaces[ifname] = {}
 			iface = ifaces[ifname]
 
