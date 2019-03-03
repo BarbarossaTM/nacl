@@ -236,6 +236,7 @@ class Netbox (object):
 				iface[our_key] = iface_config[key]
 
 		self._update_bonding_config (ifaces)
+		self._update_vlan_config (ifaces)
 
 		return ifaces
 
@@ -285,3 +286,30 @@ class Netbox (object):
 			# On Linux we don't need interface config stazas for bond members
 			for member in bonds[bond]:
 				del interfaces[member]
+
+	def _update_vlan_config (self, interfaces):
+		raw_devices = {}
+		vlan_devices = {}
+
+		# Gather devices with tagges VLANs and VLAN interfaces
+		for ifname, iface_config in interfaces.items ():
+			tagged_vlans = iface_config.get ('tagged_vlans', None)
+			if tagged_vlans:
+				raw_devices[ifname] = tagged_vlans
+
+			if ifname.startswith ('vlan'):
+				# If there's already a vlan-raw-device set, just move on
+				if 'vlan-raw-device' in iface_config:
+					continue
+
+				vlan_devices[ifname] = iface_config
+
+		for raw_device in sorted (raw_devices):
+			for vlan in raw_devices[raw_device]:
+				ifname = "vlan%s" % vlan
+
+				# If there's no vlan<vid>, there's nuthin' we could do
+				if ifname not in vlan_devices:
+					continue
+
+				vlan_devices[ifname]['vlan-raw-device'] = raw_device
