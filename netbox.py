@@ -28,7 +28,7 @@ interface_attrs = ['mac_address', 'mtu', 'name', 'tagged_vlans', 'untagged_vlan'
 # ... and there names for us
 interface_attr_map = {
 	'mac_address' : 'mac',
-	'description' : 'alias',
+	'description' : 'desc',
 }
 
 class NetboxError (Exception): {}
