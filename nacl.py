@@ -14,7 +14,7 @@ from netbox import NetboxError
 
 from werkzeug.wrappers import Request, Response
 from werkzeug.routing import Map, Rule
-from werkzeug.exceptions import HTTPException, BadRequest, NotFound, MethodNotAllowed
+from werkzeug.exceptions import HTTPException, BadRequest, NotFound, MethodNotAllowed, InternalServerError
 
 config = None
 
@@ -26,12 +26,15 @@ endpoints = {
 	# SSH
 	'/ssh/register_key' : {
 		'call' : 'ssh_register_key',
-		'post_params' : ['key_type', 'key'],
-		'request_params' : ['remote_addr'],
+		'args' : ['request/remote_addr', 'POST/key_type', 'POST/key'],
 	},
 }
 
+valid_arg_types = ['request', 'GET', 'POST']
+
+
 class NaclError (Exception): {}
+class DeveloperError (InternalServerError): {}
 
 
 class NaclWS (object):
@@ -56,52 +59,61 @@ class NaclWS (object):
 			# HAS to be present, otherwise we wouldn't be here
 			endpoint_config = endpoints[endpoint]
 
-			args = {}
-
-			if 'post_params' in endpoint_config:
-				args['post_params'] = self._gather_POST_params (request, endpoint_config['post_params'])
-
-			request_params = None
-			if 'request_params' in endpoint_config:
-				args['request_params'] = self._get_request_params (request, endpoint_config['request_params'])
-
+			# Prepare arguments to give to the endpoint as *args
+			args = self._prepare_args (request, endpoint, endpoint_config)
 
 			try:
-				res = getattr (self, 'on_' + endpoint_config['call'])(request, **values, **args)
+				func_h = getattr (self.nacl, endpoint_config['call'])
+				res = func_h (*args)
 				return Response (res)
 			except NetboxError as n:
 				return BadRequest (description = str (n))
 			except NaclError as n:
 				return BadRequest (description = str (n))
 			except Exception as n:
-				return BadRequest (description = str (n))
+				return InternalServerError (description = str (n))
 		except HTTPException as e:
 			return e
 
 
-	def _gather_POST_params (self, request, params):
-		if request.method != 'POST':
-			raise MethodNotAllowed (valid_methods = "POST", description = "POST call expected")
+	def _prepare_args (self, request, endpoint, endpoint_config):
+		args = []
 
-		post_params = {}
-		for param in params:
+		# If this endpoint does not require any args were done already, yay.
+		if 'args' not in endpoint_config:
+			return args
+
+		try:
+			for arg_config in endpoint_config['args']:
+				arg_type, arg_name = arg_config.split ('/')
+
+				args.append (self._get_arg (request, arg_type, arg_name, endpoint))
+		except ValueError:
+			raise DeveloperError ("Invalid argument config '%s' for endpoint '%s'." % (arg_config, endpoint))
+
+		return args
+
+
+	def _get_arg (self, request, arg_type, arg_name, endpoint):
+		if arg_type not in valid_arg_types:
+			raise DeveloperError ("Invalid argument type '%s' for argument '%s' for endoint '%s'." % (arg_type, arg_name, endpoint))
+
+		if arg_type in ['GET', 'POST']:
+			if request.method != arg_type:
+				raise MethodNotAllowed (valid_methods = arg_type, description = "%s call expected." % arg_type)
 			try:
-				post_params[param] = request.form[param]
+				if arg_type == "GET":
+					return request.args[arg_name]
+				elif arg_type == "POST":
+					return request.form[arg_name]
 			except KeyError:
-				raise BadRequest (description = "Expected POST param '%s'" % param)
-		return post_params
+				raise BadRequest (description = "Expected GET param '%s'" % param)
 
-
-	def _get_request_params (self, request, params):
-		request_params = {}
-
-		for param in params:
+		if arg_type == "request":
 			try:
-				request_params[param] = getattr (request, param)
+				return getattr (request, param)
 			except Exception:
 				raise HTTPException (description = "Invalid request param '%s' configured. Please hit the developer with a clue bat." % param)
-
-		return request_params
 
 
 	def wsgi_app (self, environ, start_response):
@@ -113,16 +125,6 @@ class NaclWS (object):
 
 	def __call__ (self, environ, start_response):
 		return self.wsgi_app (environ, start_response)
-
-	#
-	# Endpoints
-	#
-
-	def on_help (self, request):
-		return Response ("Welcome to Nacl!")
-
-	def on_ssh_register_key (self, request, request_params, post_params):
-		return self.nacl.register_ssh_key (request_params['remote_addr'], post_params['key_type'], post_params['key'])
 
 
 class Nacl (object):
@@ -141,6 +143,14 @@ class Nacl (object):
 			raise NaclError ("Failed to read config from '%s': %s" % (config_file, str (i)))
 
 
+	#
+	# Endpoints
+	#
+	def help (self):
+		return "Welcome to Nacl!"
+
+
+	# Register given ssh key of given type for device with given IP if none is already present
 	def register_ssh_key (self, ip, key_type, key):
 		node = self.netbox.get_node_by_ip (ip)
 
