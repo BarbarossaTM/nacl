@@ -16,8 +16,6 @@ from werkzeug.wrappers import Request, Response
 from werkzeug.routing import Map, Rule
 from werkzeug.exceptions import HTTPException, BadRequest, NotFound, MethodNotAllowed, InternalServerError
 
-config = None
-
 endpoints = {
 	'/' : {
 		'call' : 'help',
@@ -38,8 +36,8 @@ class DeveloperError (InternalServerError): {}
 
 
 class NaclWS (object):
-	def __init__ (self, config):
-		self.nacl = Nacl (config)
+	def __init__ (self, nacl):
+		self.nacl = nacl
 
 		# Build URL map
 		rules = []
@@ -164,15 +162,7 @@ class Nacl (object):
 
 
 
-def create_app ():
-	app = NaclWS (config)
 
-#	if with_static:
-#		app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
-#            '/static':  os.path.join(os.path.dirname(__file__), 'static')
-#        })
-
-	return app
 
 if __name__ == '__main__':
 
@@ -182,5 +172,6 @@ if __name__ == '__main__':
 
 	from werkzeug.serving import run_simple
 
-	app = NaclWS (args.config)
+	nacl = Nacl (args.config)
+	app = NaclWS (nacl)
 	run_simple ('127.0.0.1', 5000, app, use_debugger = True, use_reloader = True)
