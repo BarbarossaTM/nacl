@@ -109,9 +109,9 @@ class NaclWS (object):
 
 		if arg_type == "request":
 			try:
-				return getattr (request, param)
+				return getattr (request, arg_name)
 			except Exception:
-				raise HTTPException (description = "Invalid request param '%s' configured. Please hit the developer with a clue bat." % param)
+				raise HTTPException (description = "Invalid request param '%s' configured. Please hit the developer with a clue bat." % arg_name)
 
 
 	def wsgi_app (self, environ, start_response):
