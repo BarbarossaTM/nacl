@@ -287,6 +287,7 @@ class Netbox (object):
 			for member in bonds[bond]:
 				del interfaces[member]
 
+
 	def _update_vlan_config (self, interfaces):
 		raw_devices = {}
 		vlan_devices = {}
@@ -313,3 +314,149 @@ class Netbox (object):
 					continue
 
 				vlan_devices[ifname]['vlan-raw-device'] = raw_device
+
+
+	# Return a dict of all nodes (read: devices + VMs)
+	def get_nodes (self):
+		nodes = self.get_devices ()
+
+		# Merge in VMs
+		vms = self.get_vms ()
+		for vm in vms:
+			if vm in nodes:
+				# XXX Is this possible? XXX
+				raise NetboxError ("VM '%s' clashes with device of the same name!" % name)
+
+			nodes[vm] = vms[vm]
+
+		return nodes
+
+
+	# Return a dict of all devices with interfaces
+	def get_devices (self):
+		devices = {}
+
+		for device_config in self._query ("dcim/devices"):
+			role = device_config['device_role']['slug']
+			if role in ['switch', 'wbbl']:
+				continue
+
+			name = device_config['display_name']
+
+			device = {
+				'sysLocation' : device_config['site']['name'],
+				'roles': "$roles",
+				'ifaces' : {},
+				'certs' : {},
+				'ssh' : {
+					'host' : {},
+				},
+			}
+
+			devices[name] = device
+
+		# Query all interfaces and store information to devices
+		device_ifaces = self._query ("dcim/interfaces/?limit=0")
+		for iface_config in device_ifaces:
+			# Ignore interfaces which are not enabled
+			if not iface_config.get ('enabled', False):
+				continue
+
+			# Interfaces of VMs are returned but without their association :-(
+			if not iface_config['device']:
+				continue
+
+			device_name = iface_config['device']['display_name']
+			device_config = devices.get (device_name, None)
+			if not device_config:
+				continue
+
+			ifname = iface_config['name']
+			iface = {}
+
+			# Store iface config to device
+			device_config['ifaces'][ifname] = iface
+
+			# Store interface attributes we care about
+			for key in interface_attrs:
+				if not iface_config.get (key, None):
+					continue
+
+				our_key = interface_attr_map.get (key, key)
+
+				if key == "tagged_vlans":
+					iface[our_key] = self._get_vlan_ids (iface_config[key])
+					continue
+
+				iface[our_key] = iface_config[key]
+
+		# Pimp interface configs wrt to LAGs and VLANs
+		for device, device_config in devices.items ():
+			ifaces = device_config['ifaces']
+			if ifaces:
+				self._update_bonding_config (ifaces)
+				self._update_vlan_config (ifaces)
+
+		return devices
+
+
+	# Return a dict of all VMs with interfaces
+	def get_vms (self):
+		vms = {}
+
+		for vm_config in self._query ("virtualization/virtual-machines"):
+			name = vm_config['name']
+
+			vm = {
+				'sysLocation' : "$site",
+				'roles': "$roles",
+				'ifaces' : {},
+				'certs' : {},
+				'ssh' : {
+					'host' : {},
+				},
+			}
+
+			vms[name] = vm
+
+		vm_ifaces = self._query ("virtualization/interfaces")
+		for iface_config in vm_ifaces:
+			# Ignore interfaces which are not enabled
+			if not iface_config.get ('enabled', False):
+				continue
+
+			# Interfaces of VMs are returned but without their association :-(
+			if not iface_config['virtual_machine']:
+				continue
+
+			vm_name = iface_config['virtual_machine']['name']
+			vm_config = vms.get (vm_name, None)
+			if not vm_config:
+				continue
+
+			ifname = iface_config['name']
+			iface = {}
+
+			# Store iface config to device
+			vm_config['ifaces'][ifname] = iface
+
+			# Store interface attributes we care about
+			for key in interface_attrs:
+				if not iface_config.get (key, None):
+					continue
+
+				our_key = interface_attr_map.get (key, key)
+
+				if key == "tagged_vlans":
+					iface[our_key] = self._get_vlan_ids (iface_config[key])
+					continue
+
+				iface[our_key] = iface_config[key]
+
+		# Pimp interface configs wrt VLANs
+		for vm, vm_config in vms.items ():
+			ifaces = vm_config['ifaces']
+			if ifaces:
+				self._update_vlan_config (ifaces)
+
+		return vms
