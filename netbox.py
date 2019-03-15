@@ -380,6 +380,10 @@ class Netbox (object):
 			if not iface_config['device']:
 				continue
 
+			# Ignore OOB interfaces
+			if iface_config['mgmt_only']:
+				continue
+
 			device_name = iface_config['device']['display_name']
 			device_config = devices.get (device_name, None)
 			if not device_config:
