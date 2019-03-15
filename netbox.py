@@ -340,6 +340,21 @@ class Netbox (object):
 		return nodes
 
 
+	# Return node information for device with given ID
+	def get_device (self, device_id):
+		device_config = self._query ("dcim/devices/%d"% device_id, True)
+
+		device = {
+			'sysLocation' : device_config['site']['name'],
+			'roles': "$roles",
+			'ifaces' : {},
+			'certs' : {},
+			'ssh' : self._get_node_ssh_keys (device_config),
+		}
+
+		return device
+
+
 	# Return a dict of all devices with interfaces
 	def get_devices (self):
 		devices = {}
@@ -351,16 +366,7 @@ class Netbox (object):
 
 			name = device_config['display_name']
 
-			device = {
-				'sysLocation' : device_config['site']['name'],
-				'roles': "$roles",
-				'ifaces' : {},
-				'certs' : {},
-				'ssh' : {
-					'host' : {},
-				},
-			}
-
+			device = self.get_device (device_config['id'])
 			devices[name] = device
 
 		# Query all interfaces and store information to devices
@@ -408,6 +414,21 @@ class Netbox (object):
 		return devices
 
 
+	# Return node information for VM with given ID
+	def get_vm (self, vm_id):
+		vm_config = self._query ("virtualization/virtual-machines/%d"% vm_id, True)
+
+		vm = {
+			'sysLocation' : vm_config['site']['name'],
+			'roles': "$roles",
+			'ifaces' : {},
+			'certs' : {},
+			'ssh' : self._get_node_ssh_keys (vm_config),
+		}
+
+		return vm
+
+
 	# Return a dict of all VMs with interfaces
 	def get_vms (self):
 		vms = {}
@@ -415,16 +436,7 @@ class Netbox (object):
 		for vm_config in self._query ("virtualization/virtual-machines"):
 			name = vm_config['name']
 
-			vm = {
-				'sysLocation' : "$site",
-				'roles': "$roles",
-				'ifaces' : {},
-				'certs' : {},
-				'ssh' : {
-					'host' : {},
-				},
-			}
-
+			vm = self.get_vm (vm_config['id'])
 			vms[name] = vm
 
 		vm_ifaces = self._query ("virtualization/interfaces")
@@ -468,3 +480,28 @@ class Netbox (object):
 				self._update_vlan_config (ifaces)
 
 		return vms
+
+
+	def _get_node_ssh_keys (self, node_config):
+		try:
+			return {
+				'host' : {
+					'ecdsa' : {
+						'privkey': self._unfuck_ssh_private_key (node_config['config_context']['ssh']['ssh_host_ecdsa_key']),
+						'pubkey': node_config['config_context']['ssh']['ssh_host_ecdsa_key.pub'],
+					},
+
+					'ed25519' : {
+						'privkey': self._unfuck_ssh_private_key (node_config['config_context']['ssh']['ssh_host_ed25519_key']),
+						'pubkey': node_config['config_context']['ssh']['ssh_host_ed25519_key.pub'],
+					},
+
+					'rsa' : {
+						'privkey': self._unfuck_ssh_private_key (node_config['config_context']['ssh']['ssh_host_rsa_key']),
+						'pubkey': node_config['config_context']['ssh']['ssh_host_rsa_key.pub'],
+					},
+				},
+			}
+		except Exception:
+			name = node_config.get ('display_name', node_config.get ('name'))
+			raise NetboxError ("SSH keys missing in config_context of node '%s'" % name)
