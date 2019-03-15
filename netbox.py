@@ -143,23 +143,31 @@ class Netbox (object):
 			if key_type.endswith ("_pub"):
 				return key
 
-			# Fix line breaks in private keys
-			fixed_key = ""
-			for word in key.split ():
-				fixed_key += word
+			fixed_key = self._unfuck_ssh_private_key (key)
 
-				# Linebreak after marker and key parts
-				if word.endswith ("---") or len (word) > 23:
-					fixed_key += "\n"
-				# Spaces after parts of marker
-				elif len (word) < 23:
-					fixed_key += " "
 
 			# Return trailing new line before returning
 			return fixed_key.strip ()
 
 		except KeyError:
 			return None
+
+
+	def _unfuck_ssh_private_key (self, key):
+		# Fix line breaks in private keys
+		fixed_key = ""
+		for word in key.split ():
+			fixed_key += word
+
+			# Linebreak after marker and key parts
+			if word.endswith ("---") or len (word) > 23:
+				fixed_key += "\n"
+			# Spaces after parts of marker
+			elif len (word) < 23:
+				fixed_key += " "
+
+		return fixed_key
+
 
 
 	# Return all know key types (if present)
