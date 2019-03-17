@@ -357,7 +357,7 @@ class Netbox (object):
 	def get_devices (self):
 		devices = {}
 
-		for device_config in self._query ("dcim/devices"):
+		for device_config in self._query ("dcim/devices/?limit=0"):
 			role = device_config['device_role']['slug']
 			if role in ['switch', 'wbbl']:
 				continue
@@ -437,13 +437,13 @@ class Netbox (object):
 	def get_vms (self):
 		vms = {}
 
-		for vm_config in self._query ("virtualization/virtual-machines"):
+		for vm_config in self._query ("virtualization/virtual-machines/?limit=0"):
 			name = vm_config['name']
 
 			vm = self.get_vm (vm_config['id'])
 			vms[name] = vm
 
-		vm_ifaces = self._query ("virtualization/interfaces")
+		vm_ifaces = self._query ("virtualization/interfaces/?limit=0")
 		for iface_config in vm_ifaces:
 			# Ignore interfaces which are not enabled
 			if not iface_config.get ('enabled', False):
