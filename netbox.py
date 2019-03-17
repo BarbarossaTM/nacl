@@ -144,12 +144,7 @@ class Netbox (object):
 			if key_type.endswith ("_pub"):
 				return key
 
-			fixed_key = self._unfuck_ssh_private_key (key)
-
-
-			# Return trailing new line before returning
-			return fixed_key.strip ()
-
+			return self._unfuck_ssh_private_key (key)
 		except KeyError:
 			return None
 
@@ -167,8 +162,7 @@ class Netbox (object):
 			elif len (word) < 23:
 				fixed_key += " "
 
-		return fixed_key
-
+		return fixed_key.strip ()
 
 
 	# Return all know key types (if present)
