@@ -1,1 +1,4 @@
 *.pyc
+
+# Ignore configuration, if present for testing
+nacl_config.json
