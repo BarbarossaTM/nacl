@@ -4,6 +4,6 @@
 
 	"netbox" : {
 		"url" : "http://10.23.42.80:8080/",
-		"auth_token": "Token 0815decaf2342netbox4711"
+		"auth_token": "0815decaf2342netbox4711"
 	}
 }

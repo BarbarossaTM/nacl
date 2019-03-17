@@ -38,7 +38,7 @@ class Netbox (object):
 	def __init__ (self, config):
 		self._headers = {
 			'Accept': 'application/json',
-			'Authorization' : config['auth_token']
+			'Authorization' : "Token %s" % config['auth_token'],
 		}
 
 		self.base_url = config['url'].strip ('/') + "/api/"
