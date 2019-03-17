@@ -59,14 +59,15 @@ class Netbox (object):
 
 	def _post (self, url, data):
 		req = requests.post (self.base_url + url, headers = self._headers, data = data)
-		res = req.json ()
+		if req.status_code != 200:
+			raise NetboxError ("Call to %s failed with code %s" % (base_url + url, req.status_code))
 
-		return res
+		return req.json ()
 
 
 	def _put (self, url, data):
 		req = requests.put (self.base_url + url, headers = self._headers, data = data)
-		if req.status_code!= 200:
+		if req.status_code != 200:
 			raise NetboxError ("Call to %s failed with code %s" % (base_url + url, req.status_code))
 
 		return req.json ()
