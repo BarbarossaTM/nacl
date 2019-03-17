@@ -1,38 +1,23 @@
 #!/usr/bin/python3
 #
 # Maximilian Wilhelm <max@rfc2324.org>
-#  --  Fri 15 Feb 2019 09:04:27 PM CET
+#  --  Sun 17 Mar 2019 09:33:00 PM CET
 #
 
-import argparse
-import json
-import os
-import redis
-
-import netbox
-from netbox import NetboxError
+from nacl.errors import *
 
 from werkzeug.wrappers import Request, Response
 from werkzeug.routing import Map, Rule
 from werkzeug.exceptions import HTTPException, BadRequest, NotFound, MethodNotAllowed, InternalServerError
 
+valid_arg_types = ['request', 'GET', 'POST']
+
 endpoints = {
 	'/' : {
 		'call' : 'help',
-	},
-
-	# SSH
-	'/ssh/register_key' : {
-		'call' : 'ssh_register_key',
-		'args' : ['request/remote_addr', 'POST/key_type', 'POST/key'],
+		'internal': True,
 	},
 }
-
-valid_arg_types = ['request', 'GET', 'POST']
-
-
-class NaclError (Exception): {}
-class DeveloperError (InternalServerError): {}
 
 
 class NaclWS (object):
@@ -42,7 +27,11 @@ class NaclWS (object):
 		# Build URL map
 		rules = []
 
-		for url in sorted (endpoints):
+		# Merge NACL endpoints into ours
+		self.endpoints = endpoints
+		self.endpoints.update (nacl.get_endpoints ())
+
+		for url in sorted (self.endpoints):
 			# Use the URL and endpoint to be able to fetch config in dispatch_request()
 			rules.append (Rule (url, endpoint = url))
 
@@ -55,13 +44,17 @@ class NaclWS (object):
 			endpoint, values = adapter.match ()
 
 			# HAS to be present, otherwise we wouldn't be here
-			endpoint_config = endpoints[endpoint]
+			endpoint_config = self.endpoints[endpoint]
 
 			# Prepare arguments to give to the endpoint as *args
 			args = self._prepare_args (request, endpoint, endpoint_config)
 
 			try:
-				func_h = getattr (self.nacl, endpoint_config['call'])
+				if endpoint_config.get ('internal', False):
+					func_h = getattr (self, "ep_%s" % endpoint_config['call'])
+				else:
+					func_h = getattr (self.nacl, endpoint_config['call'])
+
 				res = func_h (*args)
 				return Response (res)
 			except NetboxError as n:
@@ -124,54 +117,9 @@ class NaclWS (object):
 	def __call__ (self, environ, start_response):
 		return self.wsgi_app (environ, start_response)
 
-
-class Nacl (object):
-	def __init__ (self, config_file):
-		self._read_config (config_file)
-
-		self.redis = redis.Redis (self.config['redis_host'], self.config['redis_port'])
-		self.netbox = netbox.Netbox (self.config['netbox'])
-
-
-	def _read_config (self, config_file):
-		try:
-			with open (config_file, 'r') as config_fh:
-				self.config = json.load (config_fh)
-		except IOError as i:
-			raise NaclError ("Failed to read config from '%s': %s" % (config_file, str (i)))
-
-
 	#
-	# Endpoints
+	# Internal endpoints
 	#
-	def help (self):
-		return "Welcome to Nacl!"
 
-
-	# Register given ssh key of given type for device with given IP if none is already present
-	def register_ssh_key (self, ip, key_type, key):
-		node = self.netbox.get_node_by_ip (ip)
-
-		if not node:
-			raise NaclError ("No node found for IP '%s'." % ip)
-
-		if self.netbox.get_node_ssh_key (node[0], node[1], key_type):
-			raise NaclError ("Key of type '%s' already present for node '%s'!" % (key_type, ip))
-
-		return self.netbox.set_node_ssh_key (node[0], node[1], key_type, key)
-
-
-
-
-
-if __name__ == '__main__':
-
-	parser = argparse.ArgumentParser (description = 'Netbox Automation and Caching Layer for FFHO Salt')
-	parser.add_argument ('--config', '-c', help = 'Path to config file (json format)', default = 'nacl_config.json')
-	args = parser.parse_args ()
-
-	from werkzeug.serving import run_simple
-
-	nacl = Nacl (args.config)
-	app = NaclWS (nacl)
-	run_simple ('127.0.0.1', 5000, app, use_debugger = True, use_reloader = True)
+	def ep_help (self):
+		return "Welcome to NACL!"
