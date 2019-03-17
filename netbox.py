@@ -337,6 +337,9 @@ class Netbox (object):
 
 			nodes[vm] = vms[vm]
 
+		# If we're still here, all names were unique. Let's merge in IPs then
+		self._store_ip_addresses (nodes)
+
 		return nodes
 
 
@@ -390,7 +393,9 @@ class Netbox (object):
 				continue
 
 			ifname = iface_config['name']
-			iface = {}
+			iface = {
+				'prefixes' : [],
+			}
 
 			# Store iface config to device
 			device_config['ifaces'][ifname] = iface
@@ -459,7 +464,9 @@ class Netbox (object):
 				continue
 
 			ifname = iface_config['name']
-			iface = {}
+			iface = {
+				'prefixes' : [],
+			}
 
 			# Store iface config to device
 			vm_config['ifaces'][ifname] = iface
@@ -509,3 +516,52 @@ class Netbox (object):
 		except Exception:
 			name = node_config.get ('display_name', node_config.get ('name'))
 			raise NetboxError ("SSH keys missing in config_context of node '%s'" % name)
+
+
+	# Get all IPs
+	def _store_ip_addresses (self, nodes):
+		ips = self._query ("ipam/ip-addresses/?limit=0")
+
+		for ip in ips:
+			ip_iface = ip['interface']
+			# If this IP isn't bound to an interface, we don't care about it here
+			if not ip_iface:
+				continue
+			ifname = ip_iface['name']
+
+			# We only care for active IPs
+			status = ip['status']['label']
+			if status != "Active":
+				continue
+
+			prefix = ip['address']
+
+			node = None
+			if ip_iface['device']:
+				node = ip_iface['device']['display_name']
+			elif ip_iface['virtual_machine']:
+				node = ip_iface['virtual_machine']['name']
+			else:
+				raise NetboxError ("IP '%s' bound to unknown interface. This should not have happend. Ever. At all.")
+
+			# If the given node is not present in our nodes, we don't care about it
+			if node not in nodes:
+				continue
+
+			try:
+				iface = nodes[node]['ifaces'][ifname]
+			except KeyError:
+				raise NetboxError ("Found IP '%s' bound to '%s' of '%s' but didn't find interface in my node list. D'oh." % (prefix, ifname, node))
+
+			# Store IP/mask
+			iface['prefixes'].append (prefix)
+
+			# VRF set for this IP?
+			if ip['vrf']:
+				vrf = ip['vrf']['name']
+
+				vrf_present = iface.get ('vrf', None)
+				if vrf_present and vrf_present != vrf:
+					raise NetboxError ("VRF mismatch on interface '%s' on '%s': %s vs. %s (from %s)" % (ifname, node, vrf_present, vrf, prefix))
+
+				iface['vrf'] = vrf
