@@ -14,3 +14,9 @@ Those devices will be documentated including
  * roles of the device
 
 The aim is to remove all those information from Salt pillar and use NetBox + NACL as the only source of truth for all devices.
+
+## Requirements
+
+    apt-get install python3-requests python3-werkzeug python3-redis
+
+
