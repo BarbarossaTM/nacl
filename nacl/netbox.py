@@ -8,6 +8,7 @@ import json
 import requests
 import sys
 
+from nacl.errors import *
 
 path_map = {
 	'device' : 'dcim/devices',
@@ -30,8 +31,6 @@ interface_attr_map = {
 	'mac_address' : 'mac',
 	'description' : 'desc',
 }
-
-class NetboxError (Exception): {}
 
 
 class Netbox (object):

@@ -8,4 +8,6 @@ from werkzeug.exceptions import InternalServerError
 
 class NaclError (Exception): {}
 
+class NetboxError (NaclError): {}
+
 class DeveloperError (InternalServerError): {}
