@@ -4,11 +4,12 @@
 #  --  Sun 17 Mar 2019 09:33:00 PM CET
 #
 
-from nacl.errors import *
-
+import json
 from werkzeug.wrappers import Request, Response
 from werkzeug.routing import Map, Rule
 from werkzeug.exceptions import HTTPException, BadRequest, NotFound, MethodNotAllowed, InternalServerError
+
+from nacl.errors import *
 
 valid_arg_types = ['request', 'GET', 'POST']
 
@@ -56,6 +57,9 @@ class NaclWS (object):
 					func_h = getattr (self.nacl, endpoint_config['call'])
 
 				res = func_h (*args)
+				if res:
+					res = json.dumps (res)
+
 				return Response (res)
 			except NetboxError as n:
 				return BadRequest (description = str (n))
