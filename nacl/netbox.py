@@ -24,7 +24,7 @@ valid_ssh_key_types = [
 ]
 
 # Interface attributes we care about...
-interface_attrs = ['mac_address', 'mtu', 'name', 'tagged_vlans', 'untagged_vlan', 'description', 'lag']
+interface_attrs = ['mac_address', 'mtu', 'tagged_vlans', 'untagged_vlan', 'description', 'lag']
 # ... and there names for us
 interface_attr_map = {
 	'mac_address' : 'mac',
