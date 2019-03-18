@@ -139,9 +139,9 @@ class Netbox (object):
 			node_info = self._get_node_info (device_type, device_id)
 			key = node_info['config_context']['ssh'][key_type]
 
-			# Just return the public key as is
+			# Just return the public key (without trailing space)
 			if key_type.endswith ("_pub"):
-				return key
+				return key.strip ()
 
 			return self._unfuck_ssh_private_key (key)
 		except KeyError:
