@@ -16,6 +16,8 @@ parser = argparse.ArgumentParser (description = 'Netbox Automation and Caching L
 parser.add_argument ('--config', '-c', help = 'Path to config file (json format)', default = 'nacl_config.json')
 parser.add_argument ('--debug', '-D', help = 'Activate werkzeug debugger', action = 'store_true')
 parser.add_argument ('--reload', '-R', help = 'Activate werkzeug reloader', action = 'store_true')
+parser.add_argument ('--listen', help = 'Local address to listen on.', default = '127.0.0.1')
+parser.add_argument ('--port', help = "TCP port to listen on.", default = '5000', type = int)
 
 args = parser.parse_args ()
 
@@ -26,6 +28,6 @@ nacl = Nacl (args.config)
 app = NaclWS (nacl)
 
 try:
-	run_simple ('127.0.0.1', 5000, app, use_debugger = args.debug, use_reloader = args.reload)
+	run_simple (args.listen, args.port, app, use_debugger = args.debug, use_reloader = args.reload)
 except Exception as e:
 	print ("Failed to start nacld: %s" % e)
