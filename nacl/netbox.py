@@ -348,6 +348,7 @@ class Netbox (object):
 			'ifaces' : {},
 			'certs' : {},
 			'ssh' : self._get_node_ssh_keys (device_config),
+			'id' : device_config['custom_fields'].get ('id', None),
 		}
 
 		return device
@@ -428,6 +429,7 @@ class Netbox (object):
 			'ifaces' : {},
 			'certs' : {},
 			'ssh' : self._get_node_ssh_keys (vm_config),
+			'id' : vm_config['custom_fields'].get ('id', None),
 		}
 
 		return vm
