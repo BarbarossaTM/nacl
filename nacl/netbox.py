@@ -495,17 +495,17 @@ class Netbox (object):
 				'host' : {
 					'ecdsa' : {
 						'privkey': self._unfuck_ssh_private_key (node_config['config_context']['ssh']['ssh_host_ecdsa_key']),
-						'pubkey': node_config['config_context']['ssh']['ssh_host_ecdsa_key.pub'],
+						'pubkey': node_config['config_context']['ssh']['ssh_host_ecdsa_key.pub'].strip (),
 					},
 
 					'ed25519' : {
 						'privkey': self._unfuck_ssh_private_key (node_config['config_context']['ssh']['ssh_host_ed25519_key']),
-						'pubkey': node_config['config_context']['ssh']['ssh_host_ed25519_key.pub'],
+						'pubkey': node_config['config_context']['ssh']['ssh_host_ed25519_key.pub'].strip (),
 					},
 
 					'rsa' : {
 						'privkey': self._unfuck_ssh_private_key (node_config['config_context']['ssh']['ssh_host_rsa_key']),
-						'pubkey': node_config['config_context']['ssh']['ssh_host_rsa_key.pub'],
+						'pubkey': node_config['config_context']['ssh']['ssh_host_rsa_key.pub'].strip (),
 					},
 				},
 			}
