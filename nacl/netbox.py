@@ -343,7 +343,7 @@ class Netbox (object):
 
 		device = {
 			'sysLocation' : device_config['site']['name'],
-			'roles': "$roles",
+			'roles': self._get_roles (device_config),
 			'ifaces' : {},
 			'certs' : {},
 			'ssh' : self._get_node_ssh_keys (device_config),
@@ -424,7 +424,7 @@ class Netbox (object):
 
 		vm = {
 			'sysLocation' : vm_config['site']['name'],
-			'roles': "$roles",
+			'roles': self._get_roles (vm_config),
 			'ifaces' : {},
 			'certs' : {},
 			'ssh' : self._get_node_ssh_keys (vm_config),
@@ -487,6 +487,10 @@ class Netbox (object):
 				self._update_vlan_config (ifaces)
 
 		return vms
+
+
+	def _get_roles (seof, node_config):
+		return node_config['config_context'].get ('roles', [])
 
 
 	def _get_node_ssh_keys (self, node_config):
