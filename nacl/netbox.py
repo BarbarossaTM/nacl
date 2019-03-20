@@ -344,6 +344,7 @@ class Netbox (object):
 		device = {
 			'sysLocation' : device_config['site']['name'],
 			'roles': self._get_roles (device_config),
+			'sites': self._get_sites (device_config),
 			'ifaces' : {},
 			'certs' : {},
 			'ssh' : self._get_node_ssh_keys (device_config),
@@ -425,6 +426,7 @@ class Netbox (object):
 		vm = {
 			'sysLocation' : vm_config['site']['name'],
 			'roles': self._get_roles (vm_config),
+			'sites': self._get_sites (vm_config),
 			'ifaces' : {},
 			'certs' : {},
 			'ssh' : self._get_node_ssh_keys (vm_config),
@@ -489,10 +491,17 @@ class Netbox (object):
 		return vms
 
 
-	def _get_roles (seof, node_config):
+	# Get the list of roles a node has configured, if any
+	def _get_roles (self, node_config):
 		return node_config['config_context'].get ('roles', [])
 
 
+	# Get the list of B.A.T.M.A.N. a node has configured, if any
+	def _get_sites (self, node_config):
+		return node_config['config_context'].get ('sites', [])
+
+
+	# Get the nodes SSH hosts keys
 	def _get_node_ssh_keys (self, node_config):
 		try:
 			return {
