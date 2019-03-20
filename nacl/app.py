@@ -9,14 +9,13 @@ import os
 import redis
 
 from nacl.errors import *
-
 import nacl.netbox
 
 
 endpoints = {
 	# SSH
 	'/ssh/register_key' : {
-		'call' : 'ssh_register_key',
+		'call' : 'register_ssh_key',
 		'args' : ['request/remote_addr', 'POST/key_type', 'POST/key'],
 	},
 }
