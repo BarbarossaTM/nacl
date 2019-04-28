@@ -347,7 +347,7 @@ class Netbox (object):
 			'roles': self._get_roles (device_config),
 			'sites': self._get_sites (device_config),
 			'ifaces' : {},
-			'certs' : {},
+			'certs' : self._get_node_ssl_certs (device_config),
 			'ssh' : self._get_node_ssh_keys (device_config),
 			'id' : device_config['custom_fields'].get ('id', None),
 		}
@@ -439,7 +439,7 @@ class Netbox (object):
 			'roles': self._get_roles (vm_config),
 			'sites': self._get_sites (vm_config),
 			'ifaces' : {},
-			'certs' : {},
+			'certs' : self._get_node_ssl_certs (vm_config),
 			'ssh' : self._get_node_ssh_keys (vm_config),
 			'id' : vm_config['custom_fields'].get ('id', None),
 		}
@@ -546,6 +546,29 @@ class Netbox (object):
 		except Exception:
 			name = node_config.get ('display_name', node_config.get ('name'))
 			raise NetboxError ("SSH keys missing in config_context of node '%s'" % name)
+
+
+	# Get the nodes SSL certificate
+	def _get_node_ssl_certs (self, node_config):
+		node_name = node_config.get ('display_name', node_config.get ('name'))
+		certs = {}
+
+		try:
+			for cn, cert in node_config['config_context']['ssl'].items ():
+				key = cn
+				if cn == 'host':
+					key = node_name
+
+				certs[key] = {
+					'cert': self._unfuck_crypto_key (node_config['config_context']['ssl'][cn]['cert']),
+					'privkey': self._unfuck_crypto_key (node_config['config_context']['ssl'][cn]['key']),
+				}
+		except KeyError:
+			return {}
+		except Exception as e:
+			raise NetboxError ("Failed to gather SSL certs for node '%s': %s" % (node_name, e))
+
+		return certs
 
 
 	# Get all IPs
