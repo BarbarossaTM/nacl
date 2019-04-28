@@ -18,6 +18,10 @@ endpoints = {
 		'call' : 'register_ssh_key',
 		'args' : ['request/remote_addr', 'POST/key_type', 'POST/key'],
 	},
+
+	'/get_pillar_info' : {
+		'call' : 'get_pillar_info',
+	},
 }
 
 
@@ -57,3 +61,6 @@ class Nacl (object):
 			raise NaclError ("Key of type '%s' already present for node '%s'!" % (key_type, ip))
 
 		return self.netbox.set_node_ssh_key (node[0], node[1], key_type, key)
+
+	def get_pillar_info (self):
+		return self.netbox.get_nodes ()
