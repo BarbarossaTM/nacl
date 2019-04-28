@@ -405,6 +405,10 @@ class Netbox (object):
 			if iface['has_gateway']:
 				iface['metric'] = 1337
 
+			# Should we do DHCP?
+			if 'dhcp' in iface_config['tags']:
+				iface['method'] = 'dhcp'
+
 			# Store iface config to device
 			device_config['ifaces'][ifname] = iface
 
@@ -484,6 +488,10 @@ class Netbox (object):
 			iface['status'] = 'active'
 			if 'planned' in iface_config['tags']:
 				iface['status'] = 'planned'
+
+			# Should we do DHCP?
+			if 'dhcp' in iface_config['tags']:
+				iface['method'] = 'dhcp'
 
 			# Make sure any static gateway has a worse metric than one learned via bird
 			if iface['has_gateway']:
