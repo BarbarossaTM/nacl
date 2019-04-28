@@ -143,12 +143,12 @@ class Netbox (object):
 			if key_type.endswith ("_pub"):
 				return key.strip ()
 
-			return self._unfuck_ssh_private_key (key)
+			return self._unfuck_crypto_key (key)
 		except KeyError:
 			return None
 
 
-	def _unfuck_ssh_private_key (self, key):
+	def _unfuck_crypto_key (self, key):
 		# Fix line breaks in private keys
 		fixed_key = ""
 		for word in key.split ():
@@ -507,17 +507,17 @@ class Netbox (object):
 			return {
 				'host' : {
 					'ecdsa' : {
-						'privkey': self._unfuck_ssh_private_key (node_config['config_context']['ssh']['ssh_host_ecdsa_key']),
+						'privkey': self._unfuck_crypto_key (node_config['config_context']['ssh']['ssh_host_ecdsa_key']),
 						'pubkey': node_config['config_context']['ssh']['ssh_host_ecdsa_key.pub'].strip (),
 					},
 
 					'ed25519' : {
-						'privkey': self._unfuck_ssh_private_key (node_config['config_context']['ssh']['ssh_host_ed25519_key']),
+						'privkey': self._unfuck_crypto_key (node_config['config_context']['ssh']['ssh_host_ed25519_key']),
 						'pubkey': node_config['config_context']['ssh']['ssh_host_ed25519_key.pub'].strip (),
 					},
 
 					'rsa' : {
-						'privkey': self._unfuck_ssh_private_key (node_config['config_context']['ssh']['ssh_host_rsa_key']),
+						'privkey': self._unfuck_crypto_key (node_config['config_context']['ssh']['ssh_host_rsa_key']),
 						'pubkey': node_config['config_context']['ssh']['ssh_host_rsa_key.pub'].strip (),
 					},
 				},
