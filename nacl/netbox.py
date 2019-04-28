@@ -350,6 +350,7 @@ class Netbox (object):
 			'certs' : self._get_node_ssl_certs (device_config),
 			'ssh' : self._get_node_ssh_keys (device_config),
 			'id' : device_config['custom_fields'].get ('id', None),
+			'status' : device_config['status']['label'].lower (),
 		}
 
 		return device
@@ -442,6 +443,7 @@ class Netbox (object):
 			'certs' : self._get_node_ssl_certs (vm_config),
 			'ssh' : self._get_node_ssh_keys (vm_config),
 			'id' : vm_config['custom_fields'].get ('id', None),
+			'status' : vm_config['status']['label'].lower (),
 		}
 
 		return vm
