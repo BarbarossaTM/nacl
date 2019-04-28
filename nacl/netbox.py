@@ -4,6 +4,7 @@
 #  --  Sun 22 Apr 2018 11:10:55 AM CEST
 #
 
+import ipaddress
 import json
 import requests
 import sys
@@ -391,7 +392,12 @@ class Netbox (object):
 			ifname = iface_config['name']
 			iface = {
 				'prefixes' : [],
+				'has_gateway' : 'gateway_iface' in iface_config['tags'],
 			}
+
+			# Make sure any static gateway has a worse metric than one learned via bird
+			if iface['has_gateway']:
+				iface['metric'] = 1337
 
 			# Store iface config to device
 			device_config['ifaces'][ifname] = iface
@@ -464,7 +470,12 @@ class Netbox (object):
 			ifname = iface_config['name']
 			iface = {
 				'prefixes' : [],
+				'has_gateway' : 'gateway_iface' in iface_config['tags'],
 			}
+
+			# Make sure any static gateway has a worse metric than one learned via bird
+			if iface['has_gateway']:
+				iface['metric'] = 1337
 
 			# Store iface config to device
 			vm_config['ifaces'][ifname] = iface
@@ -574,3 +585,44 @@ class Netbox (object):
 					raise NetboxError ("VRF mismatch on interface '%s' on '%s': %s vs. %s (from %s)" % (ifname, node, vrf_present, vrf, prefix))
 
 				iface['vrf'] = vrf
+
+			# Do we need a gateway?
+			if iface['has_gateway']:
+				self._update_default_gateway (iface, prefix)
+
+	def _update_default_gateway (self, iface_config, new_ip):
+		# This is gonna be ugly... But awlnx wanted it that way and
+		# I don't see any better way either right now. ¯\_(ツ)_/¯
+
+		gateways = iface_config.get ('gateway', [])
+
+		# FIXME Check if there already is a gateway for this protocol? FIXME
+
+		# An ipaddress network object is a nice thing to deal with
+		network = ipaddress.ip_network (new_ip, strict = False)
+		plen = network.prefixlen
+
+		# If this is a transfer network (/31 or /126 or /127) we use 'the other' IP
+		if plen in [ 31, 126, 127 ]:
+			index_map = {
+				31 : 0,
+				126 : 1,
+				127 : 0,
+			}
+
+			# Extract the first IP of this prefix
+			new_gw = ipaddress.ip_address (network[index_map[plen]])
+			new_ip_obj = ipaddress.ip_address (new_ip.split ('/')[0])
+
+			# If the first IP is ours, use the other (next) one
+			if new_gw == new_ip_obj:
+				new_gw = str (network[index_map[plen] + 1])
+
+			gateways.append (new_gw)
+
+		# Ok, not a transfer network but a "real" subnet, let's use the first IP of it
+		else:
+			gateways.append (str (network[1]))
+
+		iface_config['gateway'] = gateways
+
