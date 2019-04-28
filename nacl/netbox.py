@@ -395,6 +395,11 @@ class Netbox (object):
 				'has_gateway' : 'gateway_iface' in iface_config['tags'],
 			}
 
+			# Interface status
+			iface['status'] = 'active'
+			if 'planned' in iface_config['tags']:
+				iface['status'] = 'planned'
+
 			# Make sure any static gateway has a worse metric than one learned via bird
 			if iface['has_gateway']:
 				iface['metric'] = 1337
@@ -472,6 +477,11 @@ class Netbox (object):
 				'prefixes' : [],
 				'has_gateway' : 'gateway_iface' in iface_config['tags'],
 			}
+
+			# Interface status
+			iface['status'] = 'active'
+			if 'planned' in iface_config['tags']:
+				iface['status'] = 'planned'
 
 			# Make sure any static gateway has a worse metric than one learned via bird
 			if iface['has_gateway']:
@@ -568,10 +578,11 @@ class Netbox (object):
 			if node not in nodes:
 				continue
 
+			# If the interface for this IP isn't present, it's probably disabled so we didn't store it
 			try:
 				iface = nodes[node]['ifaces'][ifname]
 			except KeyError:
-				raise NetboxError ("Found IP '%s' bound to '%s' of '%s' but didn't find interface in my node list. D'oh." % (prefix, ifname, node))
+				continue
 
 			# Store IP/mask
 			iface['prefixes'].append (prefix)
