@@ -6,6 +6,7 @@
 
 import ipaddress
 import json
+import re
 import requests
 import sys
 
@@ -33,6 +34,8 @@ interface_attr_map = {
 	'description' : 'desc',
 }
 
+# Regular expression to match and split site names from tags
+batman_connect_re = re.compile (r'^batman_connect_(.*)$')
 
 class Netbox (object):
 	def __init__ (self, config):
@@ -409,6 +412,16 @@ class Netbox (object):
 			if 'dhcp' in iface_config['tags']:
 				iface['method'] = 'dhcp'
 
+			# Should we set up VXLAN overlays for B.A.T.M.A.N.?
+			batman_connect_sites = []
+			for tag in iface_config['tags']:
+				match = batman_connect_re.search (tag)
+				if match:
+					batman_connect_sites.append (match.group (1))
+
+			if batman_connect_sites:
+				iface['batman_connect_sites'] = batman_connect_sites
+
 			# Store iface config to device
 			device_config['ifaces'][ifname] = iface
 
@@ -496,6 +509,16 @@ class Netbox (object):
 			# Make sure any static gateway has a worse metric than one learned via bird
 			if iface['has_gateway']:
 				iface['metric'] = 1337
+
+			# Should we set up VXLAN overlays for B.A.T.M.A.N.?
+			batman_connect_sites = []
+			for tag in iface_config['tags']:
+				match = batman_connect_re.search (tag)
+				if match:
+					batman_connect_sites.append (match.group (1))
+
+			if batman_connect_sites:
+				iface['batman_connect_sites'] = batman_connect_sites
 
 			# Store iface config to device
 			vm_config['ifaces'][ifname] = iface
