@@ -132,10 +132,6 @@ class Netbox (object):
 	#
 	# Config context / SSH
 	#
-	def get_config_context (self, device_type, device_id):
-		return self._get_node_info (device_type, device_id)['config_context']
-
-
 	def get_node_ssh_key (self, device_type, device_id, key_type):
 		self._validate_ssh_key_type (key_type)
 
@@ -208,69 +204,6 @@ class Netbox (object):
 
 		return vlan_ids
 
-
-	def get_node_interfaces (self, device_type, device_id):
-		self._validate_device_type (device_type)
-
-		if device_type == "device":
-			res = self._query ("dcim/interfaces/?device_id=%s" % device_id)
-		elif device_type == "virtual_machine":
-			res = self._query ("virtualization/interfaces/?device_id=%s" % device_id)
-
-		ifaces =  {}
-
-		for iface_config in res:
-			ifname = iface_config['name']
-
-			# Ignore interfaces which are not enabled
-			if not iface_config.get ('enabled', False):
-				continue
-
-			ifaces[ifname] = {}
-			iface = ifaces[ifname]
-
-			for key in interface_attrs:
-				if not iface_config[key]:
-					continue
-
-				our_key = interface_attr_map.get (key, key)
-
-				if key == "tagged_vlans":
-					iface[our_key] = self._get_vlan_ids (iface_config[key])
-					continue
-
-				iface[our_key] = iface_config[key]
-
-		self._update_bonding_config (ifaces)
-		self._update_vlan_config (ifaces)
-
-		return ifaces
-
-
-	def get_node_interfaces_and_ips (self, device_type, device_id):
-		self._validate_device_type (device_type)
-
-		res = self._query ("ipam/ip-addresses/?%s_id=%s" % (device_type, device_id))
-
-		ifaces = self.get_node_interfaces (device_type, device_id)
-
-		for addr_info in res:
-			ifname = addr_info['interface']['name']
-
-			# Iface has to be present already
-			iface = ifaces[ifname]
-
-			# Prefixes list already there?
-			if not 'prefixes' in iface:
-				iface['prefixes'] = []
-
-			iface['prefixes'].append (addr_info['address'])
-
-			# Does this IP belong to a VRF?
-			if addr_info['vrf']:
-				iface['vrf'] = addr_info['vrf']
-
-		return ifaces
 
 	def _update_bonding_config (self, interfaces):
 		bonds = {}
