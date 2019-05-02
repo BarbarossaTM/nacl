@@ -307,69 +307,7 @@ class Netbox (object):
 			devices[name] = device
 
 		# Query all interfaces and store information to devices
-		device_ifaces = self._query ("dcim/interfaces/?limit=0")
-		for iface_config in device_ifaces:
-			# Ignore interfaces which are not enabled
-			if not iface_config.get ('enabled', False):
-				continue
-
-			# Interfaces of VMs are returned but without their association :-(
-			if not iface_config['device']:
-				continue
-
-			# Ignore OOB interfaces
-			if iface_config['mgmt_only']:
-				continue
-
-			device_name = iface_config['device']['display_name']
-			device_config = devices.get (device_name, None)
-			if not device_config:
-				continue
-
-			ifname = iface_config['name']
-			iface = {
-				'prefixes' : [],
-				'has_gateway' : 'gateway_iface' in iface_config['tags'],
-			}
-
-			# Interface status
-			iface['status'] = 'active'
-			if 'planned' in iface_config['tags']:
-				iface['status'] = 'planned'
-
-			# Make sure any static gateway has a worse metric than one learned via bird
-			if iface['has_gateway']:
-				iface['metric'] = 1337
-
-			# Should we do DHCP?
-			if 'dhcp' in iface_config['tags']:
-				iface['method'] = 'dhcp'
-
-			# Should we set up VXLAN overlays for B.A.T.M.A.N.?
-			batman_connect_sites = []
-			for tag in iface_config['tags']:
-				match = batman_connect_re.search (tag)
-				if match:
-					batman_connect_sites.append (match.group (1))
-
-			if batman_connect_sites:
-				iface['batman_connect_sites'] = batman_connect_sites
-
-			# Store iface config to device
-			device_config['ifaces'][ifname] = iface
-
-			# Store interface attributes we care about
-			for key in interface_attrs:
-				if not iface_config.get (key, None):
-					continue
-
-				our_key = interface_attr_map.get (key, key)
-
-				if key == "tagged_vlans":
-					iface[our_key] = self._get_vlan_ids (iface_config[key])
-					continue
-
-				iface[our_key] = iface_config[key]
+		self._get_interfaces (devices, 'device')
 
 		# Pimp interface configs wrt to LAGs and VLANs
 		for device, device_config in devices.items ():
@@ -409,19 +347,54 @@ class Netbox (object):
 			vm = self.get_vm (vm_config['id'])
 			vms[name] = vm
 
-		vm_ifaces = self._query ("virtualization/interfaces/?limit=0")
-		for iface_config in vm_ifaces:
+		self._get_interfaces (vms, 'vm')
+
+		# Pimp interface configs wrt VLANs
+		for vm, vm_config in vms.items ():
+			ifaces = vm_config['ifaces']
+			if ifaces:
+				self._update_vlan_config (ifaces)
+
+		return vms
+
+
+	# Gather all relevant interface information we need from netbox information
+	def _get_interfaces (self, nodes, node_type):
+		if node_type == 'device':
+			ifaces = self._query ("dcim/interfaces/?limit=0")
+		else:
+			ifaces = self._query ("virtualization/interfaces/?limit=0")
+
+		for iface_config in ifaces:
 			# Ignore interfaces which are not enabled
 			if not iface_config.get ('enabled', False):
 				continue
 
-			# Interfaces of VMs are returned but without their association :-(
-			if not iface_config['virtual_machine']:
+			# Ignore OOB interfaces
+			if iface_config.get ('mgmt_only', False):
 				continue
 
-			vm_name = iface_config['virtual_machine']['name']
-			vm_config = vms.get (vm_name, None)
-			if not vm_config:
+			# Netbox has two called for interfaces, one for "devices" (something you can touch)
+			# and VMs (something running in the cloud, maybe on prem, maybe not) which both kind
+			# of show all interfaces, but not all with all information.. So we have to distinguish
+			# as well. D'oh.
+			if node_type == "device":
+				if not iface_config['device']:
+					continue
+
+				node_name = iface_config['device']['display_name']
+				node_config = nodes.get (node_name, None)
+
+			else:
+				if not iface_config['virtual_machine']:
+					continue
+
+				node_name = iface_config['virtual_machine']['name']
+				node_config = nodes.get (node_name, None)
+
+			# If we didn't find the node, we seem to not care about it, so there's no point in caring
+			# about this interface either
+			if not node_config:
 				continue
 
 			ifname = iface_config['name']
@@ -435,13 +408,13 @@ class Netbox (object):
 			if 'planned' in iface_config['tags']:
 				iface['status'] = 'planned'
 
-			# Should we do DHCP?
-			if 'dhcp' in iface_config['tags']:
-				iface['method'] = 'dhcp'
-
 			# Make sure any static gateway has a worse metric than one learned via bird
 			if iface['has_gateway']:
 				iface['metric'] = 1337
+
+			# Should we do DHCP?
+			if 'dhcp' in iface_config['tags']:
+				iface['method'] = 'dhcp'
 
 			# Should we set up VXLAN overlays for B.A.T.M.A.N.?
 			batman_connect_sites = []
@@ -454,7 +427,7 @@ class Netbox (object):
 				iface['batman_connect_sites'] = batman_connect_sites
 
 			# Store iface config to device
-			vm_config['ifaces'][ifname] = iface
+			node_config['ifaces'][ifname] = iface
 
 			# Store interface attributes we care about
 			for key in interface_attrs:
@@ -468,14 +441,6 @@ class Netbox (object):
 					continue
 
 				iface[our_key] = iface_config[key]
-
-		# Pimp interface configs wrt VLANs
-		for vm, vm_config in vms.items ():
-			ifaces = vm_config['ifaces']
-			if ifaces:
-				self._update_vlan_config (ifaces)
-
-		return vms
 
 
 	# Get the list of roles a node has configured, if any
