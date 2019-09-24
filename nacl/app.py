@@ -22,6 +22,11 @@ endpoints = {
 	'/get_pillar_info' : {
 		'call' : 'get_pillar_info',
 	},
+
+	'/devices/add_surge_protector' : {
+		'call' : 'add_surge_protector',
+		'args' : ['POST/name', 'POST/site'],
+	},
 }
 
 
@@ -62,5 +67,10 @@ class Nacl (object):
 
 		return self.netbox.set_node_ssh_key (node[0], node[1], key_type, key)
 
+
 	def get_pillar_info (self):
 		return self.netbox.get_nodes ()
+
+
+	def add_surge_protector (self, name, site):
+		return self.netbox.add_surge_protector (name, site)

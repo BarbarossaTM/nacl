@@ -593,3 +593,50 @@ class Netbox (object):
 
 		iface_config['gateway'] = gateways
 
+
+	def _get_device_role_id_by_slug (self, slug):
+		res = self._query ('dcim/device-roles/?slug=%s' % slug)
+		if not res:
+			return None
+
+		return res[0]['id']
+
+
+	def _get_device_type_id (self, manufacterer, slug):
+		res = self._query ('dcim/device-types/?manufacterer=%s&slug=%s' % (manufacterer, slug))
+		if not res:
+			return None
+
+		return res[0]['id']
+
+	def _get_site_id (self, name):
+		res = self._query ('dcim/sites/?name=%s' % name)
+		if not res:
+			return None
+
+		return res[0]['id']
+
+
+	def add_surge_protector (self, name, site):
+		try:
+			blueprint = self.blueprints['surge']
+			device_role = self._get_device_role_id_by_slug (blueprint['device_role'])
+			device_type = self._get_device_type_id (blueprint['manufacturer'], blueprint['device_type'])
+		except KeyError:
+			raise BlueprintError ("No or incomplete blueprint configured for 'surge' type!")
+
+
+		site_id = self._get_site_id (site)
+		if not site_id:
+			raise NetboxError ("Site '%s' could not be found." % site)
+
+		data = {
+			'device_role' : device_role,
+			'device_type' : device_type,
+			'name' : name,
+			'site' : site_id,
+			'status' : 1,
+		}
+
+		return self._post ("dcim/devices/", data)
+
