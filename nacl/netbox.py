@@ -297,8 +297,9 @@ class Netbox (object):
 		devices = {}
 
 		for device_config in self._query ("dcim/devices/?limit=0"):
-			role = device_config['device_role']['slug']
-			if role in ['switch', 'wbbl']:
+			# We only care for Linux devices
+			platform = device_config['platform']
+			if not platform or platform['slug'] != "linux":
 				continue
 
 			name = device_config['display_name']
