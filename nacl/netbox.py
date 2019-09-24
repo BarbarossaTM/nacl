@@ -62,27 +62,27 @@ class Netbox (object):
 
 
 	def _post (self, url, data):
-		req = requests.post (self.base_url + url, headers = self._headers, data = data)
-		if req.status_code != 200:
-			raise NetboxError ("Call to %s failed with code %s" % (base_url + url, req.status_code))
+		res = requests.post (self.base_url + url, headers = self._headers, json = data)
+		if res.status_code != 201:
+			raise NetboxError ("Call to %s failed with code %s: %s" % (self.base_url + url, res.status_code, res.text))
 
-		return req.json ()
+		return res.json ()
 
 
 	def _put (self, url, data):
-		req = requests.put (self.base_url + url, headers = self._headers, data = data)
-		if req.status_code != 200:
-			raise NetboxError ("Call to %s failed with code %s" % (base_url + url, req.status_code))
+		res = requests.put (self.base_url + url, headers = self._headers, json = data)
+		if res.status_code != 200:
+			raise NetboxError ("Call to %s failed with code %s: %s" % (self.base_url + url, res.status_code, res.text))
 
-		return req.json ()
+		return res.json ()
 
 
 	def _patch (self, url, data):
-		req = requests.patch (self.base_url + url, headers = self._headers, json = data)
-		if req.status_code != 200:
-			raise NetboxError ("Call to %s failed with code %s" % (base_url + url, req.status_code))
+		res = requests.patch (self.base_url + url, headers = self._headers, json = data)
+		if res.status_code != 200:
+			raise NetboxError ("Call to %s failed with code %s: %s" % (self.base_url + url, res.status_code, res.text))
 
-		return req.json ()
+		return res.json ()
 
 
 	def get_node_by_ip (self, ip):
