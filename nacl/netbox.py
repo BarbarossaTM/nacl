@@ -38,13 +38,14 @@ interface_attr_map = {
 batman_connect_re = re.compile (r'^batman_connect_(.*)$')
 
 class Netbox (object):
-	def __init__ (self, config):
+	def __init__ (self, config, blueprints):
 		self._headers = {
 			'Accept': 'application/json',
 			'Authorization' : "Token %s" % config['auth_token'],
 		}
 
 		self.base_url = config['url'].strip ('/') + "/api/"
+		self.blueprints = blueprints
 
 
 	def _query (self, url, single_value = False):

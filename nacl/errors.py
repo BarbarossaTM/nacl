@@ -10,4 +10,6 @@ class NaclError (Exception): {}
 
 class NetboxError (NaclError): {}
 
+class BlueprintError (NaclError): {}
+
 class DeveloperError (InternalServerError): {}
