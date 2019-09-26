@@ -36,6 +36,8 @@ interface_attr_map = {
 
 # Regular expression to match and split site names from tags
 batman_connect_re = re.compile (r'^batman_connect_(.*)$')
+batman_iface_re = re.compile (r'^batman_iface_(.*)$')
+mesh_breakout_re = re.compile (r'^mesh_breakout_(.*)$')
 
 class Netbox (object):
 	def __init__ (self, config, blueprints):
@@ -418,13 +420,29 @@ class Netbox (object):
 			if 'dhcp' in iface_config['tags']:
 				iface['method'] = 'dhcp'
 
-			# Should we set up VXLAN overlays for B.A.T.M.A.N.?
+			# Evaluate tags
 			batman_connect_sites = []
 			for tag in iface_config['tags']:
+				# Should we set up VXLAN overlays for B.A.T.M.A.N.?
 				match = batman_connect_re.search (tag)
 				if match:
 					batman_connect_sites.append (match.group (1))
 
+				# Configure interface as B.A.T.M.A.N. mesh interface?
+				match = batman_iface_re.search (tag)
+				if match:
+					iface['type'] = "batman_iface"
+					iface['site'] = match.group (1)
+					iface['desc'] = "B.A.T.M.A.N. Breakout %s" % match.group (1)
+
+				# Configure interface for mesh breakout?
+				match = mesh_breakout_re.search (tag)
+				if match:
+					iface['type'] = "mesh_breakout"
+					iface['site'] = match.group (1)
+					iface['desc'] = "Mesh Breakout %s" % match.group (1)
+
+			# Any VXLAN overlays found?
 			if batman_connect_sites:
 				iface['batman_connect_sites'] = batman_connect_sites
 
