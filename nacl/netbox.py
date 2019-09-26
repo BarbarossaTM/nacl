@@ -376,7 +376,7 @@ class Netbox (object):
 			if iface_config.get ('mgmt_only', False):
 				continue
 
-			# Netbox has two called for interfaces, one for "devices" (something you can touch)
+			# Netbox has two calles for interfaces, one for "devices" (something you can touch)
 			# and VMs (something running in the cloud, maybe on prem, maybe not) which both kind
 			# of show all interfaces, but not all with all information.. So we have to distinguish
 			# as well. D'oh.
@@ -443,6 +443,63 @@ class Netbox (object):
 					continue
 
 				iface[our_key] = iface_config[key]
+
+	def _evaluate_tags (self, iface, tags):
+		for tag_id, tag_config in self.tag_config.items ():
+			match_name = tag_config['match'].get ('name')
+			match_re = tag_config['match'].get ('re_obj')
+			if match_name:
+				if match_name in tags:
+					self._store_tag_value (tag_config, iface)
+				elif set_default:
+					self._store_tag_value (tag_config, iface, use_default = True)
+
+			if match_re:
+				for tag in tags:
+					self._match_tag_re (tag_config, iface, match_re, tag)
+
+
+	def _match_tag_re (self, tag_config, iface, re_obj, tag):
+		match = re_obj.search (tag)
+		if match:
+			value = None
+			params = tag_config['match'].get ('params', 0)
+			self._store_tag_value (tag_config, iface, value = match.group (param))
+
+
+	def _store_tag_value (self, tag_config, iface, value = None, use_default = False):
+		set_config = tag_config['set']
+		if type (set_config) == list:
+			for entry in set_config:
+				self._store_tag_value (entry, iface, value, use_default)
+
+		self.__store_tag_value (set_config, iface, value, use_default)
+
+
+	def __store_tag_value (self, set_config, iface, value, use_default)
+		field = set_config['field']
+		default = set_config.get ('default')
+		fixed_value = set_config.get ('value')
+		store_list = set_config.get ('type') == "list"
+
+		# Should we set a default and is one configured?
+		if use_default and default:
+			iface[field] = default
+
+		# Should we store a fixed value?
+		elif fixed_value:
+			iface[field] = fix_value
+
+		# Should we store values as a list?
+		elif store_list:
+			if field not in iface:
+				iface[field] = []
+
+			iface[field].append (value)
+
+		# Just store a ordinary single value
+		else:
+			iface[field] = value
 
 
 	# Get the list of roles a node has configured, if any
