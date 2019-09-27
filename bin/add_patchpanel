@@ -1,0 +1,30 @@
+#!/usr/bin/python3
+#
+# Maximilian Wilhelm <max@rfc2324.org>
+#  --  Sun 17 Mar 2019 09:27:09 PM CET
+#
+
+import argparse
+import requests
+import sys
+
+nacl_url = "http://127.0.0.1:5000/devices/add_patchpanel"
+
+# Parse command line arguments
+parser = argparse.ArgumentParser (description = 'Add a Patchpanel device to netbox')
+parser.add_argument ('site', help = "Site, where device should be added.")
+parser.add_argument ('name', help = 'Name of the new device')
+parser.add_argument ('ports', help = 'Number of Copper ports the Panel has')
+
+args = parser.parse_args ()
+
+data = {
+	'name' : args.name,
+	'site' : args.site,
+	'ports' : args.ports,
+}
+
+res = requests.post (nacl_url, data = data)
+if res.status_code != 200:
+	print ("FAILED: %s" % res.text)
+	sys.exit (1)

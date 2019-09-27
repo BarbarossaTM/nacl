@@ -14,6 +14,12 @@
 			"device_role" : <slug>
 		},
 
+		"patchpanel" : {
+			"manufacturer" : "telegrtner",
+			"device_type" : "patchpanel",
+			"device_role" : "patchpanel"
+		},
+
 		"surge" : {
 			"manufacturer" : "ubnt",
 			"device_type" : "surge-protector",

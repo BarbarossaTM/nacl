@@ -27,6 +27,11 @@ endpoints = {
 		'call' : 'add_surge_protector',
 		'args' : ['POST/name', 'POST/site'],
 	},
+
+	'/devices/add_patchpanel' : {
+		'call' : 'add_patchpanel',
+		'args' : ['POST/name', 'POST/site', 'POST/ports'],
+	},
 }
 
 
@@ -74,3 +79,7 @@ class Nacl (object):
 
 	def add_surge_protector (self, name, site):
 		return self.netbox.add_surge_protector (name, site)
+
+
+	def add_patchpanel (self, name, site, ports):
+		return self.netbox.add_patchpanel (name, site, ports)
