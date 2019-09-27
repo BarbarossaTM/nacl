@@ -1,0 +1,30 @@
+#!/usr/bin/python3
+#
+# Maximilian Wilhelm <max@rfc2324.org>
+#  --  Sun 17 Mar 2019 09:27:09 PM CET
+#
+
+import argparse
+import requests
+import sys
+
+nacl_url = "http://127.0.0.1:5000/cables/connect_panel_to_surge"
+
+# Parse command line arguments
+parser = argparse.ArgumentParser (description = 'Connect panel port to surge protector')
+parser.add_argument ('panel_name', help = "Name of the patch panel")
+parser.add_argument ('panel_port', help = 'Port of the patch panel')
+parser.add_argument ('surge_name', help = 'Name of the surge protector')
+
+args = parser.parse_args ()
+
+data = {
+	'panel_name' : args.panel_name,
+	'panel_port' : args.panel_port,
+	'surge_name' : args.surge_name,
+}
+
+res = requests.post (nacl_url, data = data)
+if res.status_code != 200:
+	print ("FAILED: %s" % res.text)
+	sys.exit (1)

@@ -739,3 +739,44 @@ class Netbox (object):
 			except NetboxError as e:
 				raise NaclError ("Failed to create front port %s of %s: %s" % (n, name, e))
 
+
+	def _get_rear_port_by_name (self, device_name, port_name):
+		res = self._query ('dcim/rear-ports/?device=%s&name=%s' % (device_name, port_name))
+		if not res:
+			return None
+
+		return res[0]['id']
+
+
+	def connect_panel_to_surge (self, panel_name, panel_port, surge_name, cable_type = None, length = None, status = False):
+		termination_a_id = self._get_rear_port_by_name (panel_name, panel_port)
+		if not termination_a_id:
+			raise NaclError ("Rear port '%s' of panel '%s' doesn't exist!" % (panel_port, panel_name))
+
+		termination_b_id = self._get_rear_port_by_name (surge_name, 1)
+		if not termination_b_id:
+			raise NaclError ("Rear port '1' of surge protector '%s' doesn't exist!" % surge_name)
+
+		cable = {
+			'status' : status,
+			'termination_a_type': 'dcim.rearport',
+			'termination_a_id' : termination_a_id,
+			'termination_b_type': 'dcim.rearport',
+			'termination_b_id' : termination_b_id,
+		}
+
+		if cable_type:
+			cable['type'] = cable_type
+
+		if length:
+			if 'cm' in length:
+				cable['length_unit'] = 1100	# cm
+				cable['length'] = length.replace ('cm', '')
+			elif 'm' in length:
+				cable['length_unit'] = 1200	# m
+				cable['length'] = length.replace ('m', '')
+
+		try:
+			res = self._post ("dcim/cables/", cable)
+		except NetboxError as e:
+			raise NaclError ("Failed to create cable from port '%s' of panel '%s' to surge '%s': %s" % (panel_port, panel_name, surge_name, e))
