@@ -300,7 +300,6 @@ class Netbox (object):
 		device_config = self._query ("dcim/devices/%d"% device_id, True)
 
 		device = {
-			'sysLocation' : device_config['site']['name'],
 			'roles': self._get_roles (device_config),
 			'sites': self._get_sites (device_config),
 			'ifaces' : device_config['config_context'].get ('ifaces', {}),
@@ -308,6 +307,8 @@ class Netbox (object):
 			'ssh' : self._get_node_ssh_keys (device_config),
 			'id' : device_config['custom_fields'].get ('id', None),
 			'status' : device_config['status']['label'].lower (),
+			'location' : self._get_location_info (device_config['site']['id']),
+			'sysLocation' : device_config['site']['name'],	# XXX DEPRECATED XXX
 		}
 
 		return device
@@ -346,7 +347,6 @@ class Netbox (object):
 		vm_config = self._query ("virtualization/virtual-machines/%d"% vm_id, True)
 
 		vm = {
-			'sysLocation' : vm_config['site']['name'],
 			'roles': self._get_roles (vm_config),
 			'sites': self._get_sites (vm_config),
 			'ifaces' : vm_config['config_context'].get ('ifaces', {}),
@@ -354,6 +354,8 @@ class Netbox (object):
 			'ssh' : self._get_node_ssh_keys (vm_config),
 			'id' : vm_config['custom_fields'].get ('id', None),
 			'status' : vm_config['status']['label'].lower (),
+			'location' : self._get_location_info (vm_config['site']['id']),
+			'sysLocation' : vm_config['site']['name'],	# XXX DEPRECATED XXX
 		}
 
 		return vm
@@ -655,6 +657,29 @@ class Netbox (object):
 			return None
 
 		return res[0]['id']
+
+
+	def _get_location_info (self, site_id):
+		site = self._query ("dcim/sites/%s" % site_id, True)
+		if not site:
+			return None
+
+		location_info = {
+			'latitude' : site['latitude'],
+			'longitude' : site['longitude'],
+			'site' : {
+				'code' : site['name'],
+				'desc' : site['description'],
+			}
+		}
+
+		if site['region']:
+			location_info['region'] = {
+				'code' : site['region']['slug'],
+				'name' : site['region']['name']
+			}
+
+		return location_info
 
 
 	def add_surge_protector (self, name, site):
