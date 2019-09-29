@@ -56,7 +56,7 @@ class NaclWS (object):
 				else:
 					func_h = getattr (self.nacl, endpoint_config['call'])
 
-				res = func_h (*args)
+				res = func_h (**args)
 				if res:
 					res = json.dumps (res)
 
@@ -72,7 +72,7 @@ class NaclWS (object):
 
 
 	def _prepare_args (self, request, endpoint, endpoint_config):
-		args = []
+		args = {}
 
 		# If this endpoint does not require any args we're done already, yay.
 		if 'args' not in endpoint_config:
@@ -82,7 +82,19 @@ class NaclWS (object):
 			for arg_config in endpoint_config['args']:
 				arg_type, arg_name = arg_config.split ('/')
 
-				args.append (self._get_arg (request, arg_type, arg_name, endpoint))
+				# Is this and optional argument?
+				is_optional = False
+				if arg_name.endswith ('?'):
+					arg_name = arg_name.replace ('?', '')
+					is_optional = True
+
+				try:
+					args[arg_name] = (self._get_arg (request, arg_type, arg_name, endpoint))
+				except BadRequest as b:
+					if is_optional:
+						continue
+					else:
+						raise b
 		except ValueError:
 			raise DeveloperError ("Invalid argument config '%s' for endpoint '%s'." % (arg_config, endpoint))
 
@@ -102,7 +114,7 @@ class NaclWS (object):
 				elif arg_type == "POST":
 					return request.form[arg_name]
 			except KeyError:
-				raise BadRequest (description = "Expected GET param '%s'" % param)
+				raise BadRequest (description = "Expected %s param '%s'" % (arg_type, arg_name))
 
 		if arg_type == "request":
 			try:
