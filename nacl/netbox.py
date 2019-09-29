@@ -299,12 +299,7 @@ class Netbox (object):
 	def get_devices (self):
 		devices = {}
 
-		for device_config in self._query ("dcim/devices/?limit=0"):
-			# We only care for Linux devices
-			platform = device_config['platform']
-			if not platform or platform['slug'] != "linux":
-				continue
-
+		for device_config in self._query ("dcim/devices/?limit=0&platform=linux"):
 			name = device_config['display_name']
 
 			device = {
