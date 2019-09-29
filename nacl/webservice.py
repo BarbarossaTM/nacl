@@ -74,7 +74,7 @@ class NaclWS (object):
 	def _prepare_args (self, request, endpoint, endpoint_config):
 		args = []
 
-		# If this endpoint does not require any args were done already, yay.
+		# If this endpoint does not require any args we're done already, yay.
 		if 'args' not in endpoint_config:
 			return args
 
