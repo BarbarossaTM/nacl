@@ -295,25 +295,6 @@ class Netbox (object):
 		return nodes
 
 
-	# Return node information for device with given ID
-	def get_device (self, device_id):
-		device_config = self._query ("dcim/devices/%d"% device_id, True)
-
-		device = {
-			'roles': self._get_roles (device_config),
-			'sites': self._get_sites (device_config),
-			'ifaces' : device_config['config_context'].get ('ifaces', {}),
-			'certs' : self._get_node_ssl_certs (device_config),
-			'ssh' : self._get_node_ssh_keys (device_config),
-			'id' : device_config['custom_fields'].get ('id', None),
-			'status' : device_config['status']['label'].lower (),
-			'location' : self._get_location_info (device_config['site']['id']),
-			'sysLocation' : device_config['site']['name'],	# XXX DEPRECATED XXX
-		}
-
-		return device
-
-
 	# Return a dict of all devices with interfaces
 	def get_devices (self):
 		devices = {}
@@ -326,7 +307,18 @@ class Netbox (object):
 
 			name = device_config['display_name']
 
-			device = self.get_device (device_config['id'])
+			device = {
+				'roles': self._get_roles (device_config),
+				'sites': self._get_sites (device_config),
+				'ifaces' : device_config['config_context'].get ('ifaces', {}),
+				'certs' : self._get_node_ssl_certs (device_config),
+				'ssh' : self._get_node_ssh_keys (device_config),
+				'id' : device_config['custom_fields'].get ('id', None),
+				'status' : device_config['status']['label'].lower (),
+				'location' : self._get_location_info (device_config['site']['id']),
+				'sysLocation' : device_config['site']['name'],	# XXX DEPRECATED XXX
+			}
+
 			devices[name] = device
 
 		# Query all interfaces and store information to devices
@@ -342,25 +334,6 @@ class Netbox (object):
 		return devices
 
 
-	# Return node information for VM with given ID
-	def get_vm (self, vm_id):
-		vm_config = self._query ("virtualization/virtual-machines/%d"% vm_id, True)
-
-		vm = {
-			'roles': self._get_roles (vm_config),
-			'sites': self._get_sites (vm_config),
-			'ifaces' : vm_config['config_context'].get ('ifaces', {}),
-			'certs' : self._get_node_ssl_certs (vm_config),
-			'ssh' : self._get_node_ssh_keys (vm_config),
-			'id' : vm_config['custom_fields'].get ('id', None),
-			'status' : vm_config['status']['label'].lower (),
-			'location' : self._get_location_info (vm_config['site']['id']),
-			'sysLocation' : vm_config['site']['name'],	# XXX DEPRECATED XXX
-		}
-
-		return vm
-
-
 	# Return a dict of all VMs with interfaces
 	def get_vms (self):
 		vms = {}
@@ -368,7 +341,18 @@ class Netbox (object):
 		for vm_config in self._query ("virtualization/virtual-machines/?limit=0"):
 			name = vm_config['name']
 
-			vm = self.get_vm (vm_config['id'])
+			vm = {
+				'roles': self._get_roles (vm_config),
+				'sites': self._get_sites (vm_config),
+				'ifaces' : vm_config['config_context'].get ('ifaces', {}),
+				'certs' : self._get_node_ssl_certs (vm_config),
+				'ssh' : self._get_node_ssh_keys (vm_config),
+				'id' : vm_config['custom_fields'].get ('id', None),
+				'status' : vm_config['status']['label'].lower (),
+				'location' : self._get_location_info (vm_config['site']['id']),
+				'sysLocation' : vm_config['site']['name'],	# XXX DEPRECATED XXX
+			}
+
 			vms[name] = vm
 
 		self._get_interfaces (vms, 'vm')
