@@ -684,3 +684,99 @@ class Netbox (object):
 
 		return self._post ("dcim/devices/", data)
 
+
+	def add_patchpanel (self, name, site, ports):
+		try:
+			blueprint = self.blueprints['patchpanel']
+			device_role = self._get_device_role_id_by_slug (blueprint['device_role'])
+			device_type = self._get_device_type_id (blueprint['manufacturer'], blueprint['device_type'])
+		except KeyError:
+			raise BlueprintError ("No or incomplete blueprint configured for 'patchpanel' type!")
+
+		site_id = self._get_site_id (site)
+		if not site_id:
+			raise NetboxError ("Site '%s' could not be found." % site)
+
+		# Create device
+		data = {
+			'device_role' : device_role,
+			'device_type' : device_type,
+			'name' : name,
+			'site' : site_id,
+			'status' : 1,
+		}
+
+		res = self._post ("dcim/devices/", data)
+		if not res:
+			raise NetboxError ("Failed to create Patchpanel in Netbox: %s" % res)
+
+		# Create rear ports
+		pp_id = res['id']
+
+		for n in range (1, int (ports) + 1):
+			data = {
+				'device' : pp_id,
+				'name' : n,
+				'type' : 1000,		# 8P8C
+				'positions' : 1,	# 1 Front port per rear port
+			}
+
+			try:
+				res = self._post ("dcim/rear-ports/", data)
+			except NetboxError as e:
+				raise NaclError ("Failed to create rear port %s of %s: %s" % (n, name, e))
+
+			data = {
+				'device' : pp_id,
+				'name' : n,
+				'type' : 1000,		# 8P8C
+				'rear_port' : res['id'],
+				'rear_port_position' : 1,
+			}
+
+			try:
+				res = self._post ("dcim/front-ports/", data)
+			except NetboxError as e:
+				raise NaclError ("Failed to create front port %s of %s: %s" % (n, name, e))
+
+
+	def _get_rear_port_by_name (self, device_name, port_name):
+		res = self._query ('dcim/rear-ports/?device=%s&name=%s' % (device_name, port_name))
+		if not res:
+			return None
+
+		return res[0]['id']
+
+
+	def connect_panel_to_surge (self, panel_name, panel_port, surge_name, cable_type = None, length = None, status = False):
+		termination_a_id = self._get_rear_port_by_name (panel_name, panel_port)
+		if not termination_a_id:
+			raise NaclError ("Rear port '%s' of panel '%s' doesn't exist!" % (panel_port, panel_name))
+
+		termination_b_id = self._get_rear_port_by_name (surge_name, 1)
+		if not termination_b_id:
+			raise NaclError ("Rear port '1' of surge protector '%s' doesn't exist!" % surge_name)
+
+		cable = {
+			'status' : status,
+			'termination_a_type': 'dcim.rearport',
+			'termination_a_id' : termination_a_id,
+			'termination_b_type': 'dcim.rearport',
+			'termination_b_id' : termination_b_id,
+		}
+
+		if cable_type:
+			cable['type'] = cable_type
+
+		if length:
+			if 'cm' in length:
+				cable['length_unit'] = 1100	# cm
+				cable['length'] = length.replace ('cm', '')
+			elif 'm' in length:
+				cable['length_unit'] = 1200	# m
+				cable['length'] = length.replace ('m', '')
+
+		try:
+			res = self._post ("dcim/cables/", cable)
+		except NetboxError as e:
+			raise NaclError ("Failed to create cable from port '%s' of panel '%s' to surge '%s': %s" % (panel_port, panel_name, surge_name, e))
