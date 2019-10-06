@@ -1,0 +1,2 @@
+name,rd,tenant,enforce_unique,description
+vrf_external,1023,,True,

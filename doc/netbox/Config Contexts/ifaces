@@ -1,0 +1,7 @@
+Description: Ifaces netbox can't handle
+Assignment:
+  Platform: Linux
+
+{
+    "ifaces": {}
+}
