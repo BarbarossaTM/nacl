@@ -1,0 +1,10 @@
+Description: B.A.T.M.A.N. Sites to be configured on a node
+
+Assignment:
+ Roles:
+  * Backbone router
+  * Gateway
+
+{
+    "sites": []
+}

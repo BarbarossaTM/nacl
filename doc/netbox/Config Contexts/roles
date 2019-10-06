@@ -1,0 +1,7 @@
+Descripton: Device/VM roles
+Assignment:
+  Platform: Linux
+
+{
+    "roles": []
+}
