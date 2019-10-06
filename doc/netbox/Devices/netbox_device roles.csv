@@ -1,0 +1,13 @@
+name,slug,color,vm_role
+AcceesPoint,acceespoint,2f6a31,
+Backbone router,backbone-router,9c27b0,
+Core router,core-router,aa1409,True
+CPE,cpe,795548,True
+Gateway,gateway,ffc107,True
+KVM-Host,kvm-host,111111,
+OOB Management,oob-management,aa1409,
+Patchpanel,patchpanel,9e9e9e,
+PUMP,pump,2f6a31,
+Surge Protector,surge-protector,ffffff,
+Switch,switch,2196f3,
+WBBL,wbbl,2f6a31,
