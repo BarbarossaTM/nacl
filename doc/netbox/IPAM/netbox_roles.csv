@@ -1,0 +1,16 @@
+name,slug,weight
+B.A.T.M.A.N. IP,b-a-t-m-a-n-ip,1000
+B.A.T.M.A.N. Mesh,b-a-t-m-a-n-mesh,1000
+External stuff/devices,external-stuffdevices,1000
+L2-X-Connect,l2-x-connect,1000
+L3-Access,l3-access,1000
+Loopbacks,loopbacks,1000
+Mgmt,mgmt,1000
+OPS-Network,ops-network,1000
+PNI (Private Network Interconnects),pni-private-network-interconnects,1000
+POP-Network,pop-network,1000
+Uplink,uplink,1000
+VLL (MPLS-Transport),vll-mpls-transport,1000
+VPN-X-Connect,vpn-x-connect,1000
+WBBL-PTP-Link,wbbl-ptp-link,1000
+Wireless-local-link (WLL),wireless-local-link-wll,1000
