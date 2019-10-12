@@ -66,14 +66,13 @@ class Nacl (object):
 	#
 
 	# Register given ssh key of given type for device with given IP if none is already present
-	def register_ssh_key (self, ip, key_type, key):
-		node = self.netbox.get_node_by_ip (ip)
-
+	def register_ssh_key (self, remote_addr, key_type, key):
+		node = self.netbox.get_node_by_ip (remote_addr)
 		if not node:
-			raise NaclError ("No node found for IP '%s'." % ip)
+			raise NaclError ("No node found for IP '%s'." % remote_addr)
 
 		if self.netbox.get_node_ssh_key (node[0], node[1], key_type):
-			raise NaclError ("Key of type '%s' already present for node '%s'!" % (key_type, ip))
+			raise NaclError ("Key of type '%s' already present for node '%s'!" % (key_type, remote_addr))
 
 		return self.netbox.set_node_ssh_key (node[0], node[1], key_type, key)
 
