@@ -13,27 +13,31 @@ import nacl.netbox
 
 
 endpoints = {
-	# SSH
-	'/ssh/register_key' : {
+	# API endpoints called by nodes
+	'/node/register_ssh_key' : {
 		'call' : 'register_ssh_key',
 		'args' : ['request/remote_addr', 'POST/key_type', 'POST/key'],
 	},
 
-	'/get_pillar_info' : {
+
+	# API endpoints called by Salt
+	'/salt/get_pillar_info' : {
 		'call' : 'get_pillar_info',
 	},
 
-	'/devices/add_surge_protector' : {
+
+	# API endpoints called by CLI tools / ops
+	'/ops/devices/add_surge_protector' : {
 		'call' : 'add_surge_protector',
 		'args' : ['POST/name', 'POST/site'],
 	},
 
-	'/devices/add_patchpanel' : {
+	'/ops/devices/add_patchpanel' : {
 		'call' : 'add_patchpanel',
 		'args' : ['POST/name', 'POST/site', 'POST/ports'],
 	},
 
-	'/cables/connect_panel_to_surge' : {
+	'/ops/cables/connect_panel_to_surge' : {
 		'call' : 'connect_panel_to_surge',
 		'args' : [ 'POST/panel_name', 'POST/panel_port', 'POST/surge_name'],
 	},
