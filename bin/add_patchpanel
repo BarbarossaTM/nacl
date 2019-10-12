@@ -8,7 +8,7 @@ import argparse
 import requests
 import sys
 
-nacl_url = "http://127.0.0.1:5000/devices/add_patchpanel"
+nacl_url = "http://127.0.0.1:5000/ops/devices/add_patchpanel"
 
 # Parse command line arguments
 parser = argparse.ArgumentParser (description = 'Add a Patchpanel device to netbox')
