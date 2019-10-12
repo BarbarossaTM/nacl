@@ -8,7 +8,7 @@ import argparse
 import requests
 import sys
 
-nacl_url = "http://127.0.0.1:5000/devices/add_surge_protector"
+nacl_url = "http://127.0.0.1:5000/ops/devices/add_surge_protector"
 
 # Parse command line arguments
 parser = argparse.ArgumentParser (description = 'Add a Surge Protector device to netbox')

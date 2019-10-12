@@ -8,7 +8,7 @@ import argparse
 import requests
 import sys
 
-nacl_url = "http://127.0.0.1:5000/cables/connect_panel_to_surge"
+nacl_url = "http://127.0.0.1:5000/ops/cables/connect_panel_to_surge"
 
 # Parse command line arguments
 parser = argparse.ArgumentParser (description = 'Connect panel port to surge protector')
