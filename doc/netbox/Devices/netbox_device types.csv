@@ -1,10 +1,12 @@
 manufacturer,model,slug,part_number,u_height,is_full_depth,subdevice_role,comments
+AFOP,CW4-0244-S1105,cw4-0244-s1105,,0,,,6 Channel CWDM Mux / Demux Pair
+AFOP,CW4-RACK-19000,cw4-rack-19000,,1,,Parent,"FWDM, SpectraMux 1 or 2 CWDM or DWDM modules 19'' / 1HU"
 Cisco,WS-C3560E-12D,ws-c3560e-12d,,1,,,
 Cisco,WS-C3560G-48TS,ws-c3560g-48ts,,1,,,
 Cisco,WS-C4900M,ws-c4900m,,2,,,"hw-module module m port-group p 
 select [gigabitethernet | tengigabitethernet]"
 Dell,PowerEdge R610,poweredge-r610,,1,True,,
-HP,ProLiant DL360 G7,proliant-dl360-g7,,1,True,,
+HP,ProLiant DL360 G6,proliant-dl360-g6,,2,True,,
 Netonix,WS12-250-AC,ws12-250-ac,,1,,,
 PCEngines,APU2c4,apu2c4,,1,,,
 PCEngines,APU2c4-19",apu2c4-19,,1,,,
@@ -23,3 +25,6 @@ Ubnt,PBE-5AC-300,pbe-5ac-300,,1,,,
 Ubnt,PBE-5AC-500,pbe-5ac-500,,1,,,
 Ubnt,PBE-5AC-Gen2,pbe-5ac-gen2,,1,,,
 Ubnt,Surge Protector,surge-protector,,1,,,
+Ubnt,UAP-AC-Lite,uap-ac-lite,,0,,,
+Ubnt,UAP-AC-M,uap-ac-m,,0,,,
+Ubnt,UAP-AC-M-Pro,uap-ac-m-pro,,0,,,
