@@ -25,6 +25,19 @@
 			"device_type" : "surge-protector",
 			"device_role" : "surge-protector"
 		}
+	},
+
+	"defaults" : {
+		"interfaces" : {
+			"by_name" : {
+				"anycast_srv" : {
+					"link-type": "dummy"
+				},
+				"srv" : {
+					"link-type": "dummy"
+				}
+			}
+		}
 	}
 
 }

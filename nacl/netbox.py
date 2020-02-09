@@ -38,9 +38,10 @@ interface_attr_map = {
 batman_connect_re = re.compile (r'^batman_connect_(.*)$')
 batman_iface_re = re.compile (r'^batman_iface_(.*)$')
 mesh_breakout_re = re.compile (r'^mesh_breakout_(.*)$')
+ospf_cost_re = re.compile (r'^ospf_cost_([0-9]+)$')
 
 class Netbox (object):
-	def __init__ (self, config, blueprints):
+	def __init__ (self, config, blueprints, defaults):
 		self._headers = {
 			'Accept': 'application/json',
 			'Authorization' : "Token %s" % config['auth_token'],
@@ -48,6 +49,7 @@ class Netbox (object):
 
 		self.base_url = config['url'].strip ('/') + "/api/"
 		self.blueprints = blueprints
+		self.defaults = defaults
 
 
 	def _query (self, url, single_value = False):
@@ -448,6 +450,14 @@ class Netbox (object):
 			# Store 802.1Q mode
 			if iface_config['mode']:
 				iface['vlan_mode'] = iface_config['mode']['label']
+
+			# IF there are any defaults for this interface, apply them
+			try:
+				defaults = self.defaults['interfaces']['by_name'][ifname]
+				for key, value in defaults.items ():
+					iface[key] = value
+			except KeyError:
+				pass
 
 			# Store iface config to device
 			node_config['ifaces'][ifname] = iface
