@@ -402,11 +402,15 @@ class Netbox (object):
 			if not node_config:
 				continue
 
+			# There may be a (partial) ifaces dict present already when set via confix_context.
+			# If so, we use it as base
 			ifname = iface_config['name']
-			iface = {
-				'prefixes' : [],
-				'has_gateway' : 'gateway_iface' in iface_config['tags'],
-			}
+			iface = node_config['ifaces'].get (ifname, {})
+
+			if 'prefixes' not in iface:
+				iface['prefixes'] = []
+
+			iface['has_gateway'] = 'gateway_iface' in iface_config['tags']
 
 			# Interface status
 			iface['status'] = 'active'
