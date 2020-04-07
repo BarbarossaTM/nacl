@@ -443,6 +443,14 @@ class Netbox (object):
 					iface['site'] = match.group (1)
 					iface['desc'] = "Mesh Breakout %s" % match.group (1)
 
+				# Configure OSPF on this interface?
+				match = ospf_cost_re.search (tag)
+				if match:
+					iface['ospf'] = {
+						'stub' : False,
+						'cost' : match.group (1)
+					}
+
 			# Any VXLAN overlays found?
 			if batman_connect_sites:
 				iface['batman_connect_sites'] = batman_connect_sites
