@@ -278,6 +278,20 @@ class Netbox (object):
 
 				iface_config['vlan-raw-device'] = tagged_all_iface
 
+
+	# Get primary IPv4 and IPv6 add, if set
+	def _get_primary_ips (self, node_config):
+		ips = {}
+
+		if node_config['primary_ip4']:
+			ips['v4'] = node_config['primary_ip4']['address'].split ('/')[0]
+
+		if node_config['primary_ip6']:
+			ips['v6'] = node_config['primary_ip6']['address'].split ('/')[0]
+
+		return ips
+
+
 	# Return a dict of all nodes (read: devices + VMs)
 	def get_nodes (self):
 		nodes = self.get_devices ()
@@ -308,6 +322,7 @@ class Netbox (object):
 				'roles': self._get_roles (device_config),
 				'sites': self._get_sites (device_config),
 				'ifaces' : device_config['config_context'].get ('ifaces', {}),
+				'primary_ips' : self._get_primary_ips (device_config),
 				'certs' : self._get_node_ssl_certs (device_config),
 				'ssh' : self._get_node_ssh_keys (device_config),
 				'id' : device_config['custom_fields'].get ('id', None),
@@ -342,6 +357,7 @@ class Netbox (object):
 				'roles': self._get_roles (vm_config),
 				'sites': self._get_sites (vm_config),
 				'ifaces' : vm_config['config_context'].get ('ifaces', {}),
+				'primary_ips' : self._get_primary_ips (vm_config),
 				'certs' : self._get_node_ssl_certs (vm_config),
 				'ssh' : self._get_node_ssh_keys (vm_config),
 				'id' : vm_config['custom_fields'].get ('id', None),
