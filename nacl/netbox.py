@@ -329,6 +329,7 @@ class Netbox (object):
 				'status' : device_config['status']['label'].lower (),
 				'location' : self._get_location_info (device_config['site']['id']),
 				'sysLocation' : device_config['site']['name'],	# XXX DEPRECATED XXX
+				'monitoring' : device_config['config_context'].get ('monitoring', {}),
 			}
 
 			devices[name] = device
@@ -364,6 +365,7 @@ class Netbox (object):
 				'status' : vm_config['status']['label'].lower (),
 				'location' : self._get_location_info (vm_config['site']['id']),
 				'sysLocation' : vm_config['site']['name'],	# XXX DEPRECATED XXX
+				'monitoring' : vm_config['config_context'].get ('monitoring', {}),
 			}
 
 			vms[name] = vm
