@@ -319,6 +319,11 @@ class Netbox (object):
 			name = device_config['display_name']
 
 			device = {
+				'hardware' : True,
+				'manufacturer' : device_config['device_type']['manufacturer']['name'],
+				'model' : device_config['device_type']['model'],
+				'oob' : {},
+				#
 				'roles': self._get_roles (device_config),
 				'sites': self._get_sites (device_config),
 				'ifaces' : device_config['config_context'].get ('ifaces', {}),
@@ -401,10 +406,6 @@ class Netbox (object):
 			if not iface_config.get ('enabled', False):
 				continue
 
-			# Ignore OOB interfaces
-			if iface_config.get ('mgmt_only', False):
-				continue
-
 			# Netbox has two called for interfaces, one for "devices" (something you can touch)
 			# and VMs (something running in the cloud, maybe on prem, maybe not) which both kind
 			# of show all interfaces, but not all with all information.. So we have to distinguish
@@ -428,9 +429,18 @@ class Netbox (object):
 			if not node_config:
 				continue
 
+			# Name of the interface we are dealing with
+			ifname = iface_config['name']
+
+			# Store OOB interfaces seperately so we can store an IP address configured on it later
+			# when we query all IP addresses. Sadly the ipaddress API call does not return wether
+			# an interface the IP is bound to is OOB or not, so we have to work around that *sniff*
+			if iface_config.get ('mgmt_only', False):
+				node_config['oob'][ifname] = {}
+				continue
+
 			# There may be a (partial) ifaces dict present already when set via confix_context.
 			# If so, we use it as base
-			ifname = iface_config['name']
 			iface = node_config['ifaces'].get (ifname, {})
 
 			if 'prefixes' not in iface:
@@ -607,7 +617,12 @@ class Netbox (object):
 			try:
 				iface = nodes[node]['ifaces'][ifname]
 			except KeyError:
-				continue
+				# Check if it's an OOB interface, if so, store the IP and carry on
+				try:
+					nodes[node]['oob'][ifname] = prefix
+					continue
+				except KeyError:
+					continue
 
 			# Store IP/mask
 			iface['prefixes'].append (prefix)
