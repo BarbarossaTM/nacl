@@ -1,0 +1,37 @@
+#!/usr/bin/python3
+
+import argparse
+import json
+import sys
+
+import nacl.netbox
+
+parser = argparse.ArgumentParser ()
+parser.add_argument ('--config', '-c', help = "Path to 'nacl_config.json'", default = './nacl_config.json')
+parser.add_argument ('--all', '-a', action = 'store_true', help = 'Print all nodes')
+parser.add_argument ('--node', '-n', help = 'Only show given node')
+args = parser.parse_args ()
+
+if not args.all and not args.node:
+	print ("Either --all/-a or --node/-n has to be given!")
+	sys.exit (1)
+
+try:
+	with open (args.config, 'r') as config_fh:
+		config = json.load (config_fh)
+except IOError as i:
+	print ("Failed to read config from '%s': %s" % (args.config, str (i)))
+
+netbox = nacl.netbox.Netbox (config['netbox'], {}, {})
+
+nodes = netbox.get_nodes ()
+
+if args.node:
+	node = nodes.get (args.node, None)
+	if not node:
+		print ("Node '%s' not found" % args.node)
+
+	print (json.dumps (node, indent = 4, sort_keys = True))
+
+elif args.all:
+	print (json.dumps (nodes, indent = 4, sort_keys = True))
