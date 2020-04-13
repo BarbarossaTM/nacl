@@ -355,6 +355,14 @@ class Netbox (object):
 			name = vm_config['name']
 
 			vm = {
+				'virtual' : True,
+				'cluster' : vm_config['cluster']['name'],
+				'vm_config' : {
+					'vcpus' : vm_config['vcpus'],
+					'memory' : vm_config['memory'],
+				'disk' : vm_config['disk'],
+				},
+				#
 				'roles': self._get_roles (vm_config),
 				'sites': self._get_sites (vm_config),
 				'ifaces' : vm_config['config_context'].get ('ifaces', {}),
