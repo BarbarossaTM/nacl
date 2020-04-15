@@ -160,7 +160,7 @@ class Netbox (object):
 			fixed_key += word
 
 			# Linebreak after marker and key parts
-			if word.endswith ("---") or len (word) > 23:
+			if word.endswith ("---") or len (word) > 23 or '=' in word:
 				fixed_key += "\n"
 			# Spaces after parts of marker
 			elif len (word) < 23:
