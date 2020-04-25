@@ -634,8 +634,16 @@ class Netbox (object):
 
 				iface['vrf'] = vrf
 
-			# Do we need a gateway?
-			if iface['has_gateway']:
+			# Static gateway set for this IP?
+			gateway = ip['custom_fields'].get ('gateway', None)
+			if gateway:
+				if not 'gateway' in iface:
+					iface['gateway'] = []
+
+				iface['gateway'].append (gateway)
+
+			# Shall we calculate a gateway?
+			if iface['has_gateway'] and not gateway:
 				self._update_default_gateway (iface, prefix)
 
 	def _update_default_gateway (self, iface_config, new_ip):
