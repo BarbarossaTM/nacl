@@ -28,17 +28,26 @@ valid_ssh_key_types = [
 
 # Interface attributes we care about...
 interface_attrs = ['mac_address', 'mtu', 'tagged_vlans', 'untagged_vlan', 'description', 'lag']
-# ... and there names for us
+# ... and their names for us
 interface_attr_map = {
 	'mac_address' : 'mac',
 	'description' : 'desc',
 }
 
-# Regular expression to match and split site names from tags
+#
+# Regular expression to match tag information
+#
+
+# batman_connect_<site>
 batman_connect_re = re.compile (r'^batman_connect_(.*)$')
+# batman_iface_<site>
 batman_iface_re = re.compile (r'^batman_iface_(.*)$')
+# mesh_breakout_<site>
 mesh_breakout_re = re.compile (r'^mesh_breakout_(.*)$')
+# ospf_cost_<cost>
 ospf_cost_re = re.compile (r'^ospf_cost_([0-9]+)$')
+
+
 
 class Netbox (object):
 	def __init__ (self, config, blueprints, defaults):
@@ -356,7 +365,7 @@ class Netbox (object):
 				'vm_config' : {
 					'vcpus' : vm_config['vcpus'],
 					'memory' : vm_config['memory'],
-				'disk' : vm_config['disk'],
+					'disk' : vm_config['disk'],
 				},
 			}
 
@@ -401,7 +410,7 @@ class Netbox (object):
 		return node
 
 
-	# Gather all relevant interface information we need from netbox information
+	# Gather all relevant interface information we need from netbox
 	def _get_interfaces (self, nodes, node_type):
 		if node_type == 'device':
 			ifaces = self._query ("dcim/interfaces/?limit=0")
@@ -413,7 +422,7 @@ class Netbox (object):
 			if not iface_config.get ('enabled', False):
 				continue
 
-			# Netbox has two called for interfaces, one for "devices" (something you can touch)
+			# Netbox has two calles for interfaces, one for "devices" (something you can touch)
 			# and VMs (something running in the cloud, maybe on prem, maybe not) which both kind
 			# of show all interfaces, but not all with all information.. So we have to distinguish
 			# as well. D'oh.
@@ -646,13 +655,15 @@ class Netbox (object):
 			if iface['has_gateway'] and not gateway:
 				self._update_default_gateway (iface, prefix)
 
-	def _update_default_gateway (self, iface_config, new_ip):
-		# This is gonna be ugly... But awlnx wanted it that way and
-		# I don't see any better way either right now. ¯\_(ツ)_/¯
 
+	# Calculate fallback gateway
+	def _update_default_gateway (self, iface_config, new_ip):
 		gateways = iface_config.get ('gateway', [])
 
-		# FIXME Check if there already is a gateway for this protocol? FIXME
+		# If there happen to be any gateways set already - which they shouldn't -
+		# just carry on and don't screw things up.
+		if gateways:
+			return
 
 		# An ipaddress network object is a nice thing to deal with
 		network = ipaddress.ip_network (new_ip, strict = False)
