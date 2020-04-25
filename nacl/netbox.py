@@ -323,19 +323,10 @@ class Netbox (object):
 				'manufacturer' : device_config['device_type']['manufacturer']['name'],
 				'model' : device_config['device_type']['model'],
 				'oob' : {},
-				#
-				'roles': self._get_roles (device_config),
-				'sites': self._get_sites (device_config),
-				'ifaces' : device_config['config_context'].get ('ifaces', {}),
-				'primary_ips' : self._get_primary_ips (device_config),
-				'certs' : self._get_node_ssl_certs (device_config),
-				'ssh' : self._get_node_ssh_keys (device_config),
-				'id' : device_config['custom_fields'].get ('id', None),
-				'status' : device_config['status']['label'].lower (),
-				'location' : self._get_location_info (device_config['site']['id']),
-				'sysLocation' : device_config['site']['name'],	# XXX DEPRECATED XXX
-				'monitoring' : device_config['config_context'].get ('monitoring', {}),
 			}
+
+			# Merge in attributes common to devices and VMS
+			device.update (self._get_common_attributes (device_config))
 
 			devices[name] = device
 
@@ -367,19 +358,10 @@ class Netbox (object):
 					'memory' : vm_config['memory'],
 				'disk' : vm_config['disk'],
 				},
-				#
-				'roles': self._get_roles (vm_config),
-				'sites': self._get_sites (vm_config),
-				'ifaces' : vm_config['config_context'].get ('ifaces', {}),
-				'primary_ips' : self._get_primary_ips (vm_config),
-				'certs' : self._get_node_ssl_certs (vm_config),
-				'ssh' : self._get_node_ssh_keys (vm_config),
-				'id' : vm_config['custom_fields'].get ('id', None),
-				'status' : vm_config['status']['label'].lower (),
-				'location' : self._get_location_info (vm_config['site']['id']),
-				'sysLocation' : vm_config['site']['name'],	# XXX DEPRECATED XXX
-				'monitoring' : vm_config['config_context'].get ('monitoring', {}),
 			}
+
+			# Merge in attributes common to devices and VMS
+			vm.update (self._get_common_attributes (vm_config))
 
 			vms[name] = vm
 
@@ -392,6 +374,31 @@ class Netbox (object):
 				self._update_vlan_config (ifaces)
 
 		return vms
+
+	# Get common attributes of devices and VMs
+	def _get_common_attributes (self, node_config):
+		node = {
+			'primary_ips' : self._get_primary_ips (node_config),
+			'certs' : self._get_node_ssl_certs (node_config),
+			'ssh' : self._get_node_ssh_keys (node_config),
+			'id' : node_config['custom_fields'].get ('id', None),
+			'status' : node_config['status']['label'].lower (),
+			'location' : self._get_location_info (node_config['site']['id']),
+			'sysLocation' : node_config['site']['name'],	# XXX DEPRECATED XXX
+			#
+			# Maybe in config_context:
+			# roles, sites, ifaces, monitoring, mailname, ...
+		}
+
+		# Merge in config_context data, IFF it doesn't overwrite anything
+		for key, value in node_config.get ('config_context', {}).items ():
+			# Those need special care
+			if key in ['ssh', 'ssl']:
+				continue
+
+			node[key] = value
+
+		return node
 
 
 	# Gather all relevant interface information we need from netbox information
@@ -522,16 +529,6 @@ class Netbox (object):
 					continue
 
 				iface[our_key] = iface_config[key]
-
-
-	# Get the list of roles a node has configured, if any
-	def _get_roles (self, node_config):
-		return node_config['config_context'].get ('roles', [])
-
-
-	# Get the list of B.A.T.M.A.N. a node has configured, if any
-	def _get_sites (self, node_config):
-		return node_config['config_context'].get ('sites', [])
 
 
 	# Get the nodes SSH hosts keys
