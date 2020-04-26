@@ -660,11 +660,6 @@ class Netbox (object):
 	def _update_default_gateway (self, iface_config, new_ip):
 		gateways = iface_config.get ('gateway', [])
 
-		# If there happen to be any gateways set already - which they shouldn't -
-		# just carry on and don't screw things up.
-		if gateways:
-			return
-
 		# An ipaddress network object is a nice thing to deal with
 		network = ipaddress.ip_network (new_ip, strict = False)
 		plen = network.prefixlen
