@@ -254,7 +254,7 @@ class Netbox (object):
 				raw_devices[ifname] = tagged_vlans
 
 			# Interfacee in Tagged All mode
-			if iface_config.get ('vlan_mode') == "Tagged All":
+			if iface_config.get ('vlan_mode') == "tagged-all":
 				tagged_all_iface = ifname
 				del iface_config['vlan_mode']
 
@@ -513,7 +513,7 @@ class Netbox (object):
 
 			# Store 802.1Q mode
 			if iface_config['mode']:
-				iface['vlan_mode'] = iface_config['mode']['label']
+				iface['vlan_mode'] = iface_config['mode']['value']
 
 			# IF there are any defaults for this interface, apply them
 			try:
