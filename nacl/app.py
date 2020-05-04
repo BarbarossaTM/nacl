@@ -41,6 +41,11 @@ endpoints = {
 		'call' : 'connect_panel_to_surge',
 		'args' : [ 'POST/panel_name', 'POST/panel_port', 'POST/surge_name'],
 	},
+
+	'/ops/ip/add' : {
+		'call' : 'add_ip',
+		'args' : [ 'POST/status', 'POST/address', 'POST/dns_name?', 'POST/interface?', 'POST/device?', 'POST/vm?' ],
+	}
 }
 
 
@@ -95,3 +100,12 @@ class Nacl (object):
 
 	def connect_panel_to_surge (self, panel_name, panel_port, surge_name):
 		return self.netbox.connect_panel_to_surge (panel_name, panel_port, surge_name)
+
+	def add_ip (self, status, address, dns_name = None, interface = None, device = None, vm = None):
+		if_id = None
+		if interface:
+			if_id = self.netbox.get_interface (interface, device_name = device, vm_name = vm)
+			if not if_id:
+				raise NaclError ("Did not find interface, not adding IP address!")
+
+		return self.netbox.add_ip (status, address, dns_name, if_id)

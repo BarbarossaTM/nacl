@@ -854,3 +854,44 @@ class Netbox (object):
 			res = self._post ("dcim/cables/", cable)
 		except NetboxError as e:
 			raise NaclError ("Failed to create cable from port '%s' of panel '%s' to surge '%s': %s" % (panel_port, panel_name, surge_name, e))
+
+
+################################################################################
+#                                 Interfaces                                   #
+################################################################################
+
+	def get_interface (self, ifname, device_name = None, vm_name = None):
+		res = None
+
+		if device_name:
+			res = self._query ("dcim/interfaces/?device=%s&name=%s" % (device_name, ifname))
+
+		if vm_name:
+			res = self._query ("virtualization/interfaces/?virtual_machine=%s&name=%s" % (vm_name, ifname))
+
+		if res:
+			return res[0]['id']
+
+		return None
+
+
+################################################################################
+#                                IP addresses                                  #
+################################################################################
+
+	def add_ip (self, status, address, dns_name, interface):
+		ip = {
+			'status' : status,
+			'address' : address,
+		}
+
+		if dns_name:
+			ip['dns_name'] = dns_name
+
+		if interface:
+			ip['interface'] = interface
+
+		try:
+			return self._post ("ipam/ip-addresses/", ip)
+		except NetboxError as e:
+			raise NaclError ("Failed to add IP address '%s' (status '%s): %s" % (address, status, e))
