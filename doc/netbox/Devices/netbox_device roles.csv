@@ -1,19 +1,19 @@
-name,slug,color,vm_role
-Access Point,access-point,8bc34a,
-Backbone router,backbone-router,9c27b0,
-Core router,core-router,aa1409,True
-Core switch,core-switch,3f51b5,
-CPE,cpe,795548,True
-DNS-Server,dns-server,607d8b,True
-Gateway,gateway,ffc107,True
-KVM-Host,kvm-host,111111,
-Monitoring,monitoring,111111,True
-OOB Management,oob-management,aa1409,
-Patchpanel,patchpanel,9e9e9e,
-PUMP,pump,2f6a31,
-Server,server,607d8b,True
-Surge Protector,surge-protector,ffffff,
-Switch,switch,2196f3,
-WBBL,wbbl,2f6a31,
-WDM,wdm,e91e63,
-WLL,wll,4caf50,
+name,slug,color,vm_role,description
+Access Point,access-point,8bc34a,,
+Backbone router,backbone-router,9c27b0,,
+Core router,core-router,aa1409,True,Core/Border Router
+Core switch,core-switch,3f51b5,,L3-Switch
+CPE,cpe,795548,True,
+DNS-Server,dns-server,607d8b,True,
+Gateway,gateway,ffc107,True,
+KVM-Host,kvm-host,111111,,
+Monitoring,monitoring,111111,True,
+OOB,oob,aa1409,,Out-of-Band Management
+Patchpanel,patchpanel,9e9e9e,,
+PUMP,pump,2f6a31,,Premium Ultra Mesh Plus
+Server,server,607d8b,True,
+Surge Protector,surge-protector,ffffff,,
+Switch,switch,2196f3,,
+WBBL,wbbl,2f6a31,,Wireless Backbone Link
+WDM,wdm,e91e63,,Optical Multiplexer (CWDM/DWDM)
+WLL,wll,4caf50,,Wireless Local Link
