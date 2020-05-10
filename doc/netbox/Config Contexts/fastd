@@ -1,0 +1,13 @@
+Description: Fastd crypto keys
+Assignment:
+  Platform: Linux
+  Roles: Gatewa
+
+{
+    "fastd": {
+        "intergw_privkey": "",
+        "intergw_pubkey": "",
+        "nodes_privkey": "",
+        "nodes_pubkey": ""
+    }
+}
