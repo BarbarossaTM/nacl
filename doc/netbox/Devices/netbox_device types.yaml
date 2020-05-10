@@ -1,0 +1,864 @@
+manufacturer: Cisco
+model: WS-C3560E-12D
+slug: ws-c3560e-12d
+part_number: ''
+u_height: 1
+is_full_depth: false
+subdevice_role: ''
+comments: ''
+console-ports:
+- name: con0
+  type: ''
+power-ports:
+- name: psu1
+  type: ''
+  maximum_draw: null
+  allocated_draw: null
+- name: psu2
+  type: ''
+  maximum_draw: null
+  allocated_draw: null
+interfaces:
+- name: Te0/1
+  type: 10gbase-x-x2
+  mgmt_only: false
+- name: Te0/2
+  type: 10gbase-x-x2
+  mgmt_only: false
+- name: Te0/3
+  type: 10gbase-x-x2
+  mgmt_only: false
+- name: Te0/4
+  type: 10gbase-x-x2
+  mgmt_only: false
+- name: Te0/5
+  type: 10gbase-x-x2
+  mgmt_only: false
+- name: Te0/6
+  type: 10gbase-x-x2
+  mgmt_only: false
+- name: Te0/7
+  type: 10gbase-x-x2
+  mgmt_only: false
+- name: Te0/8
+  type: 10gbase-x-x2
+  mgmt_only: false
+- name: Te0/9
+  type: 10gbase-x-x2
+  mgmt_only: false
+- name: Te0/10
+  type: 10gbase-x-x2
+  mgmt_only: false
+- name: Te0/11
+  type: 10gbase-x-x2
+  mgmt_only: false
+- name: Te0/12
+  type: 10gbase-x-x2
+  mgmt_only: false
+- name: Fa0
+  type: 100base-tx
+  mgmt_only: true
+---
+manufacturer: Cisco
+model: WS-C3560G-48TS
+slug: ws-c3560g-48ts
+part_number: ''
+u_height: 1
+is_full_depth: false
+subdevice_role: ''
+comments: ''
+console-ports:
+- name: con0
+  type: ''
+power-ports:
+- name: psu1
+  type: ''
+  maximum_draw: null
+  allocated_draw: null
+interfaces:
+- name: Gi0/1
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/2
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/3
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/4
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/5
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/6
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/7
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/8
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/9
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/10
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/11
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/12
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/13
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/14
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/15
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/16
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/17
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/18
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/19
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/20
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/21
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/22
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/23
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/24
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/25
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/26
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/27
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/28
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/29
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/30
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/31
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/32
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/33
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/34
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/35
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/36
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/37
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/38
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/39
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/40
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/41
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/42
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/43
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/44
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/45
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/46
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/47
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/48
+  type: 1000base-t
+  mgmt_only: false
+- name: Gi0/49
+  type: 1000base-x-sfp
+  mgmt_only: false
+- name: Gi0/50
+  type: 1000base-x-sfp
+  mgmt_only: false
+- name: Gi0/51
+  type: 1000base-x-sfp
+  mgmt_only: false
+- name: Gi0/52
+  type: 1000base-x-sfp
+  mgmt_only: false
+---
+manufacturer: Cisco
+model: WS-C4900M
+slug: ws-c4900m
+part_number: ''
+u_height: 2
+is_full_depth: false
+subdevice_role: ''
+comments: "hw-module module m port-group p \r\nselect [gigabitethernet | tengigabitethernet]"
+interfaces:
+- name: Te1/1
+  type: 10gbase-x-x2
+  mgmt_only: false
+- name: Te1/2
+  type: 10gbase-x-x2
+  mgmt_only: false
+- name: Te1/3
+  type: 10gbase-x-x2
+  mgmt_only: false
+- name: Te1/4
+  type: 10gbase-x-x2
+  mgmt_only: false
+- name: Te1/5
+  type: 10gbase-x-x2
+  mgmt_only: false
+- name: Te1/6
+  type: 10gbase-x-x2
+  mgmt_only: false
+- name: Te1/7
+  type: 10gbase-x-x2
+  mgmt_only: false
+- name: Te1/8
+  type: 10gbase-x-x2
+  mgmt_only: false
+---
+manufacturer: Dell
+model: PowerEdge R610
+slug: poweredge-r610
+part_number: ''
+u_height: 1
+is_full_depth: true
+subdevice_role: ''
+comments: ''
+console-ports:
+- name: ttyS0
+  type: ''
+power-ports:
+- name: psu1
+  type: ''
+  maximum_draw: null
+  allocated_draw: null
+- name: psu2
+  type: ''
+  maximum_draw: null
+  allocated_draw: null
+interfaces:
+- name: eno1
+  type: 1000base-t
+  mgmt_only: false
+- name: eno2
+  type: 1000base-t
+  mgmt_only: false
+- name: eno3
+  type: 1000base-t
+  mgmt_only: false
+- name: eno4
+  type: 1000base-t
+  mgmt_only: false
+- name: lo
+  type: virtual
+  mgmt_only: false
+- name: lom
+  type: 100base-tx
+  mgmt_only: true
+---
+manufacturer: FS.com
+model: FMU-1UFMX-N
+slug: fmu-1ufmx-n
+part_number: FMU-1UFMX-N
+u_height: 1
+is_full_depth: false
+subdevice_role: parent
+comments: ''
+device-bays:
+- name: '1'
+- name: '2'
+---
+manufacturer: FS.com
+model: FMU-MC082745 -  8Ch-MUX 1270-1450 (Skip 1390,1410)
+slug: fmu-mc082745
+part_number: '42937'
+u_height: 0
+is_full_depth: false
+subdevice_role: child
+comments: ''
+front-ports:
+- name: '1270'
+  type: lc
+  rear_port: Line
+  rear_port_position: 1
+- name: '1290'
+  type: lc
+  rear_port: Line
+  rear_port_position: 2
+- name: '1310'
+  type: lc
+  rear_port: Line
+  rear_port_position: 3
+- name: '1330'
+  type: lc
+  rear_port: Line
+  rear_port_position: 4
+- name: '1350'
+  type: lc
+  rear_port: Line
+  rear_port_position: 5
+- name: '1370'
+  type: lc
+  rear_port: Line
+  rear_port_position: 6
+- name: '1430'
+  type: lc
+  rear_port: Line
+  rear_port_position: 7
+- name: '1450'
+  type: lc
+  rear_port: Line
+  rear_port_position: 8
+rear-ports:
+- name: Line
+  type: lc
+  positions: 8
+---
+manufacturer: HP
+model: ProLiant DL360 G6
+slug: proliant-dl360-g6
+part_number: ''
+u_height: 2
+is_full_depth: true
+subdevice_role: ''
+comments: ''
+interfaces:
+- name: eth0
+  type: 1000base-t
+  mgmt_only: false
+- name: eth1
+  type: 1000base-t
+  mgmt_only: false
+- name: eth2
+  type: 1000base-t
+  mgmt_only: false
+- name: eth3
+  type: 1000base-t
+  mgmt_only: false
+- name: lo
+  type: virtual
+  mgmt_only: false
+- name: lom
+  type: 1000base-t
+  mgmt_only: true
+---
+manufacturer: Netonix
+model: WS12-250-AC
+slug: ws12-250-ac
+part_number: ''
+u_height: 1
+is_full_depth: false
+subdevice_role: ''
+comments: ''
+console-ports:
+- name: ttyS0
+  type: ''
+power-ports:
+- name: power0
+  type: ''
+  maximum_draw: null
+  allocated_draw: null
+interfaces:
+- name: '1'
+  type: 1000base-t
+  mgmt_only: false
+- name: '2'
+  type: 1000base-t
+  mgmt_only: false
+- name: '3'
+  type: 1000base-t
+  mgmt_only: false
+- name: '4'
+  type: 1000base-t
+  mgmt_only: false
+- name: '5'
+  type: 1000base-t
+  mgmt_only: false
+- name: '6'
+  type: 1000base-t
+  mgmt_only: false
+- name: '7'
+  type: 1000base-t
+  mgmt_only: false
+- name: '8'
+  type: 1000base-t
+  mgmt_only: false
+- name: '9'
+  type: 1000base-t
+  mgmt_only: false
+- name: '10'
+  type: 1000base-t
+  mgmt_only: false
+- name: '11'
+  type: 1000base-t
+  mgmt_only: false
+- name: '12'
+  type: 1000base-t
+  mgmt_only: false
+- name: '13'
+  type: 1000base-x-sfp
+  mgmt_only: false
+- name: '14'
+  type: 1000base-x-sfp
+  mgmt_only: false
+---
+manufacturer: PCEngines
+model: APU2c4
+slug: apu2c4
+part_number: ''
+u_height: 1
+is_full_depth: false
+subdevice_role: ''
+comments: ''
+console-ports:
+- name: ttyS0
+  type: ''
+power-ports:
+- name: psu1
+  type: ''
+  maximum_draw: null
+  allocated_draw: null
+interfaces:
+- name: bond0
+  type: lag
+  mgmt_only: false
+- name: enp1s0
+  type: 1000base-t
+  mgmt_only: false
+- name: enp2s0
+  type: 1000base-t
+  mgmt_only: false
+- name: enp3s0
+  type: 1000base-t
+  mgmt_only: false
+- name: lo
+  type: virtual
+  mgmt_only: false
+---
+manufacturer: PCEngines
+model: APU2c4-19"
+slug: apu2c4-19
+part_number: ''
+u_height: 1
+is_full_depth: false
+subdevice_role: ''
+comments: ''
+console-ports:
+- name: ttyS0
+  type: ''
+power-ports:
+- name: psu1
+  type: ''
+  maximum_draw: null
+  allocated_draw: null
+interfaces:
+- name: bond0
+  type: lag
+  mgmt_only: false
+- name: enp1s0
+  type: 1000base-t
+  mgmt_only: false
+- name: enp2s0
+  type: 1000base-t
+  mgmt_only: false
+- name: enp3s0
+  type: 1000base-t
+  mgmt_only: false
+- name: lo
+  type: virtual
+  mgmt_only: false
+---
+manufacturer: Raspberry Pi Foundation
+model: Raspberry Pi 3
+slug: raspberry-pi-3
+part_number: ''
+u_height: 0
+is_full_depth: false
+subdevice_role: ''
+comments: ''
+interfaces:
+- name: eth0
+  type: 1000base-t
+  mgmt_only: false
+---
+manufacturer: RIPE
+model: Atlas Probe 3
+slug: atlas-probe-3
+part_number: ''
+u_height: 0
+is_full_depth: false
+subdevice_role: ''
+comments: ''
+interfaces:
+- name: eth0
+  type: 1000base-t
+  mgmt_only: false
+---
+manufacturer: SuperMicro
+model: X10DRL-i
+slug: x10drl-i
+part_number: ''
+u_height: 1
+is_full_depth: true
+subdevice_role: ''
+comments: ''
+console-ports:
+- name: ttyS0
+  type: ''
+power-ports:
+- name: psu1
+  type: ''
+  maximum_draw: null
+  allocated_draw: null
+- name: psu2
+  type: ''
+  maximum_draw: null
+  allocated_draw: null
+interfaces:
+- name: eth0
+  type: 1000base-t
+  mgmt_only: false
+- name: eth1
+  type: 1000base-t
+  mgmt_only: false
+- name: lo
+  type: virtual
+  mgmt_only: false
+---
+manufacturer: "Teleg\xE4rtner"
+model: Patchpanel
+slug: patchpanel
+part_number: ''
+u_height: 1
+is_full_depth: false
+subdevice_role: ''
+comments: ''
+---
+manufacturer: TP-Link
+model: T1700X-16TS
+slug: t1700x-16ts
+part_number: ''
+u_height: 1
+is_full_depth: false
+subdevice_role: ''
+comments: ''
+power-ports:
+- name: psu1
+  type: ''
+  maximum_draw: null
+  allocated_draw: null
+---
+manufacturer: Ubnt
+model: AirFiber-X AF-5X
+slug: airfiber-x-af-5x
+part_number: ''
+u_height: 0
+is_full_depth: false
+subdevice_role: ''
+comments: ''
+interfaces:
+- name: data
+  type: 1000base-t
+  mgmt_only: false
+- name: mgmt
+  type: 1000base-t
+  mgmt_only: true
+---
+manufacturer: Ubnt
+model: ER-X
+slug: er-x
+part_number: ''
+u_height: 1
+is_full_depth: false
+subdevice_role: ''
+comments: ''
+interfaces:
+- name: eth0
+  type: 1000base-t
+  mgmt_only: false
+- name: eth1
+  type: 1000base-t
+  mgmt_only: false
+- name: eth2
+  type: 1000base-t
+  mgmt_only: false
+- name: eth3
+  type: 1000base-t
+  mgmt_only: false
+- name: eth4
+  type: 1000base-t
+  mgmt_only: false
+---
+manufacturer: Ubnt
+model: ER-X-SFP
+slug: er-x-sfp
+part_number: ''
+u_height: 1
+is_full_depth: false
+subdevice_role: ''
+comments: ''
+interfaces:
+- name: eth0
+  type: 1000base-t
+  mgmt_only: false
+- name: eth1
+  type: 1000base-t
+  mgmt_only: false
+- name: eth2
+  type: 1000base-t
+  mgmt_only: false
+- name: eth3
+  type: 1000base-t
+  mgmt_only: false
+- name: eth4
+  type: 1000base-t
+  mgmt_only: false
+- name: eth5
+  type: 1000base-x-sfp
+  mgmt_only: false
+---
+manufacturer: Ubnt
+model: LBE-5AC-16-120
+slug: lbe-5ac-16-120
+part_number: ''
+u_height: 0
+is_full_depth: false
+subdevice_role: ''
+comments: ''
+interfaces:
+- name: br0
+  type: virtual
+  mgmt_only: false
+- name: lan0
+  type: 1000base-t
+  mgmt_only: false
+- name: wlan0
+  type: ieee802.11ac
+  mgmt_only: false
+---
+manufacturer: Ubnt
+model: NanoBeam M5 19
+slug: nanobeam-m5-19
+part_number: ''
+u_height: 0
+is_full_depth: false
+subdevice_role: ''
+comments: ''
+interfaces:
+- name: br0
+  type: virtual
+  mgmt_only: false
+- name: br1
+  type: virtual
+  mgmt_only: false
+- name: lan0
+  type: 1000base-t
+  mgmt_only: false
+- name: wlan0
+  type: virtual
+  mgmt_only: false
+---
+manufacturer: Ubnt
+model: NBE-5AC-19
+slug: nbe-5ac-19
+part_number: ''
+u_height: 0
+is_full_depth: false
+subdevice_role: ''
+comments: ''
+interfaces:
+- name: br0
+  type: other
+  mgmt_only: false
+- name: br1
+  type: other
+  mgmt_only: false
+- name: eth0
+  type: 1000base-t
+  mgmt_only: false
+- name: wlan0
+  type: ieee802.11ac
+  mgmt_only: false
+---
+manufacturer: Ubnt
+model: PBE-5AC-300
+slug: pbe-5ac-300
+part_number: ''
+u_height: 0
+is_full_depth: false
+subdevice_role: ''
+comments: ''
+interfaces:
+- name: br0
+  type: virtual
+  mgmt_only: false
+- name: br1
+  type: virtual
+  mgmt_only: false
+- name: lan0
+  type: 1000base-t
+  mgmt_only: false
+- name: wlan0
+  type: sonet-oc3
+  mgmt_only: false
+---
+manufacturer: Ubnt
+model: PBE-5AC-500
+slug: pbe-5ac-500
+part_number: ''
+u_height: 0
+is_full_depth: false
+subdevice_role: ''
+comments: ''
+interfaces:
+- name: br0
+  type: virtual
+  mgmt_only: false
+- name: br1
+  type: virtual
+  mgmt_only: false
+- name: lan0
+  type: 1000base-t
+  mgmt_only: false
+- name: wlan0
+  type: sonet-oc3
+  mgmt_only: false
+---
+manufacturer: Ubnt
+model: PBE-5AC-Gen2
+slug: pbe-5ac-gen2
+part_number: ''
+u_height: 0
+is_full_depth: false
+subdevice_role: ''
+comments: ''
+interfaces:
+- name: br0
+  type: virtual
+  mgmt_only: false
+- name: br1
+  type: virtual
+  mgmt_only: true
+- name: lan0
+  type: 1000base-t
+  mgmt_only: false
+- name: wlan0
+  type: sonet-oc3
+  mgmt_only: false
+---
+manufacturer: Ubnt
+model: Surge Protector
+slug: surge-protector
+part_number: ''
+u_height: 0
+is_full_depth: false
+subdevice_role: ''
+comments: ''
+front-ports:
+- name: '1'
+  type: 8p8c
+  rear_port: '1'
+  rear_port_position: 1
+rear-ports:
+- name: '1'
+  type: 8p8c
+  positions: 1
+---
+manufacturer: Ubnt
+model: UAP-AC-Lite
+slug: uap-ac-lite
+part_number: ''
+u_height: 0
+is_full_depth: false
+subdevice_role: ''
+comments: ''
+interfaces:
+- name: lan0
+  type: 1000base-t
+  mgmt_only: false
+- name: lan1
+  type: 1000base-t
+  mgmt_only: false
+---
+manufacturer: Ubnt
+model: UAP-AC-M
+slug: uap-ac-m
+part_number: ''
+u_height: 0
+is_full_depth: false
+subdevice_role: ''
+comments: ''
+interfaces:
+- name: lan0
+  type: 1000base-t
+  mgmt_only: false
+- name: lan1
+  type: 1000base-t
+  mgmt_only: false
+---
+manufacturer: Ubnt
+model: UAP-AC-M-Pro
+slug: uap-ac-m-pro
+part_number: ''
+u_height: 0
+is_full_depth: false
+subdevice_role: ''
+comments: ''
+interfaces:
+- name: lan0
+  type: 1000base-t
+  mgmt_only: false
+- name: lan1
+  type: 1000base-t
+  mgmt_only: false

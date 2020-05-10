@@ -1,14 +1,14 @@
-name,slug
-AFOP,afop
-Cisco,cisco
-Dell,dell
-Flexoptics,flexoptics
-HP,hp
-Netonix,netonix
-PCEngines,pcengines
-Raspberry Pi Foundation,raspberry-pi-foundation
-RIPE,ripe
-SuperMicro,supermicro
-Telegärtner,telegrtner
-TP-Link,tp-link
-Ubnt,ubnt
+name,slug,description
+Cisco,cisco,
+Dell,dell,
+Flexoptics,flexoptics,
+FS.com,fs-com,
+HP,hp,
+Netonix,netonix,
+PCEngines,pcengines,
+Raspberry Pi Foundation,raspberry-pi-foundation,
+RIPE,ripe,
+SuperMicro,supermicro,
+Telegärtner,telegrtner,
+TP-Link,tp-link,
+Ubnt,ubnt,
