@@ -1,16 +1,17 @@
-name,slug,weight
-B.A.T.M.A.N. IP,b-a-t-m-a-n-ip,1000
-B.A.T.M.A.N. Mesh,b-a-t-m-a-n-mesh,1000
-External stuff/devices,external-stuffdevices,1000
-L2-X-Connect,l2-x-connect,1000
-L3-Access,l3-access,1000
-Loopbacks,loopbacks,1000
-Mgmt,mgmt,1000
-OPS-Network,ops-network,1000
-PNI (Private Network Interconnects),pni-private-network-interconnects,1000
-POP-Network,pop-network,1000
-Uplink,uplink,1000
-VLL (MPLS-Transport),vll-mpls-transport,1000
-VPN-X-Connect,vpn-x-connect,1000
-WBBL-PTP-Link,wbbl-ptp-link,1000
-Wireless-local-link (WLL),wireless-local-link-wll,1000
+name,slug,weight,description
+B.A.T.M.A.N. IP,b-a-t-m-a-n-ip,1000,IP prefix transported within B.A.T.M.A.N.
+B.A.T.M.A.N. Mesh,b-a-t-m-a-n-mesh,1000,B.A.T.M.A.N. mesh protocol (Ethernet)
+External stuff/devices,external-stuffdevices,1000,
+Gateway Prefix,gateway-prefix,1000,Virtual Gateway prefixes for TE
+L2-X-Connect,l2-x-connect,1000,PTP Ethernet Links
+L3-Access,l3-access,1000,
+Loopbacks,loopbacks,1000,Loopback IPs
+Mgmt,mgmt,1000,Management
+OPS-Network,ops-network,1000,
+PNI,pni,1000,Private Network Interconnects
+POP-Network,pop-network,1000,IP-Network to connect all devices/VMs within a POP
+Uplink,uplink,1000,
+VLL,vll,1000,MPLS Transport
+VPN-X-Connect,vpn-x-connect,1000,PTP IP-VPN (OpenVPN/Wireguard)
+WBBL-PTP-Link,wbbl-ptp-link,1000,Wireless Backbone Link (PTP)
+WLL,wll,1000,Wireless Local Link (PTP/PTMP)
