@@ -288,15 +288,15 @@ class Netbox (object):
 				iface_config['vlan-raw-device'] = tagged_all_iface
 
 
-	# Get primary IPv4 and IPv6 add, if set
+	# Get primary IPv4 and IPv6 address/plen, if set
 	def _get_primary_ips (self, node_config):
 		ips = {}
 
 		if node_config['primary_ip4']:
-			ips['v4'] = node_config['primary_ip4']['address'].split ('/')[0]
+			ips['v4'] = node_config['primary_ip4']['address']
 
 		if node_config['primary_ip6']:
-			ips['v6'] = node_config['primary_ip6']['address'].split ('/')[0]
+			ips['v6'] = node_config['primary_ip6']['address']
 
 		return ips
 
