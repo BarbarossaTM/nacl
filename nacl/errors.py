@@ -12,4 +12,6 @@ class NetboxError (NaclError): {}
 
 class BlueprintError (NaclError): {}
 
+class CacheError (NaclError): {}
+
 class DeveloperError (InternalServerError): {}
