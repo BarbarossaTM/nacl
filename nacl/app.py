@@ -6,7 +6,6 @@
 
 import json
 import os
-import redis
 
 from nacl.errors import *
 import nacl.netbox
@@ -72,7 +71,6 @@ class Nacl (object):
 
 		self._read_config (config_file)
 
-		self.redis = redis.Redis (self.config['redis_host'], self.config['redis_port'])
 		self.netbox = nacl.netbox.Netbox (self.config['netbox'], self.config.get ('blueprints', {}), self.config.get ('defaults', {}))
 
 

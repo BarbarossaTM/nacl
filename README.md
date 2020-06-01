@@ -17,6 +17,6 @@ The aim is to remove all those information from Salt pillar and use NetBox + NAC
 
 ## Requirements
 
-    apt-get install python3-requests python3-werkzeug python3-redis
+    apt-get install python3-requests python3-werkzeug
 
 
