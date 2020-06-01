@@ -102,7 +102,7 @@ class Nacl (object):
 
 
 	def get_pillar_info (self, minion_id):
-		nodes = self.cache.get_nodes ()
+		nodes = self.netbox.get_nodes ()
 
 		# Filter out and private keys which are not for <minion_id>
 		for node, node_config in nodes.items ():
