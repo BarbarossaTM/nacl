@@ -5,9 +5,9 @@
 #
 
 import json
-from werkzeug.wrappers import Request, Response
-from werkzeug.routing import Map, Rule
 from werkzeug.exceptions import HTTPException, BadRequest, NotFound, MethodNotAllowed, InternalServerError
+from werkzeug.routing import Map, Rule
+from werkzeug.wrappers import Request, Response
 
 from nacl.errors import *
 
