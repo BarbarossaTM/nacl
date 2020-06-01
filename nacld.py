@@ -5,6 +5,7 @@
 #
 
 import argparse
+import logging
 import sys
 from werkzeug.serving import run_simple
 
@@ -18,8 +19,50 @@ parser.add_argument ('--debug', '-D', help = 'Activate werkzeug debugger', actio
 parser.add_argument ('--reload', '-R', help = 'Activate werkzeug reloader', action = 'store_true')
 parser.add_argument ('--listen', help = 'Local address to listen on.', default = '127.0.0.1')
 parser.add_argument ('--port', help = "TCP port to listen on.", default = '5000', type = int)
+parser.add_argument ('--log-level', help = "Log level", choices = ['debug', 'info', 'warning', 'error', 'critical'], default = 'info')
+parser.add_argument ('--log-file', help = "Path to log file, - for stdout (default)", default = '-')
 
 args = parser.parse_args ()
+
+#
+# Set up logging
+#
+
+def setup_logging (args):
+	# Fire up a logger for NACL and one which will be used by werkzeug
+	nacl = logging.getLogger ('nacl')
+
+	# Log level?
+	level_map = {
+		'debug' : logging.DEBUG,
+		'info' : logging.INFO,
+		'warning' : logging.WARNING,
+		'error' : logging.ERROR,
+		'critical' : logging.CRITICAL,
+	}
+
+	# Set NACL log level
+	nacl.setLevel (level_map[args.log_level])
+
+	# Where to log to?
+	if args.log_file == '-':
+		handler = logging.StreamHandler ()
+	else:
+		handler = logging.FileHandler (args.log_file)
+
+	# Log format
+	formatter = logging.Formatter ('%(asctime)s %(levelname)s %(message)s')
+	handler.setFormatter (formatter)
+
+	nacl.addHandler (handler)
+
+	return nacl
+
+#
+# Let's go
+#
+log = setup_logging (args)
+log.info ("NACL starting...")
 
 # Fire up NACL application
 nacl = Nacl (args.config)
