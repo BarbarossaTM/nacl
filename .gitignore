@@ -1,3 +1,9 @@
+#
+# NACL .gitignore
+#
+*.swp
+
+# Compiled Python code
 *.pyc
 
 # Ignore configuration, if present for testing
