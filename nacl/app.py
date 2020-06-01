@@ -23,6 +23,7 @@ endpoints = {
 	# API endpoints called by Salt
 	'/salt/get_pillar_info' : {
 		'call' : 'get_pillar_info',
+		'args' : ['GET/minion_id'],
 	},
 
 
@@ -47,6 +48,22 @@ endpoints = {
 		'args' : [ 'POST/status', 'POST/address', 'POST/dns_name?', 'POST/interface?', 'POST/device?', 'POST/vm?' ],
 	}
 }
+
+
+# Remove anyting we don't want to share with other minions
+def _remove_private_keys (node, node_config):
+	# Remove private SSH host keys
+	for key_type in ['ecdsa', 'ed25519', 'rsa']:
+		try:
+			del node_config['ssh']['host'][key_type]['privkey']
+		except KeyError:
+			continue
+
+	# Remove key of SSL host cert
+	try:
+		del node_config['certs'][node]['privkey']
+	except KeyError:
+		pass
 
 
 class Nacl (object):
@@ -86,8 +103,15 @@ class Nacl (object):
 		return self.netbox.set_node_ssh_key (node[0], node[1], key_type, key)
 
 
-	def get_pillar_info (self):
-		return self.netbox.get_nodes ()
+	def get_pillar_info (self, minion_id):
+		nodes = self.cache.get_nodes ()
+
+		# Filter out and private keys which are not for <minion_id>
+		for node, node_config in nodes.items ():
+			if node != minion_id:
+				_remove_private_keys (node, node_config)
+
+		return nodes
 
 
 	def add_surge_protector (self, name, site):
