@@ -88,6 +88,17 @@ class NaclWS (object):
 					arg_name = arg_name.replace ('?', '')
 					is_optional = True
 
+				# Are we getting a stream of JSON stuff?
+				if arg_name == 'JSON':
+					if request.mimetype != "application/json":
+						raise BadRequets ("Expecting JSON data, but Content-Type is '%s'" % request.mimetype)
+
+					try:
+						args['data'] = json.loads (request.data)
+						continue
+					except ValueError as v:
+						raise BadRequest ("Failed to load JSON stream: %s" % v)
+
 				try:
 					args[arg_name] = (self._get_arg (request, arg_type, arg_name, endpoint))
 				except BadRequest as b:
