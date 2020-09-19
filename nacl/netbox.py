@@ -478,6 +478,9 @@ class Netbox (object):
 				iface['method'] = 'dhcp'
 
 			# Evaluate tags
+			if iface_config['tags']:
+				iface_config['tags'] = self._get_tag_slugs (iface_config['tags'])
+
 			batman_connect_sites = []
 			for tag in iface_config['tags']:
 				# Should we set up VXLAN overlays for B.A.T.M.A.N.?
@@ -539,6 +542,17 @@ class Netbox (object):
 
 				iface[our_key] = iface_config[key]
 
+	# Tags are now represented as a list containing dicts, one for each tag.
+	# The dict contains the 'name', 'slug', etc.
+	# Build a list of all slugs
+	def _get_tag_slugs (self, tags):
+		slugs = []
+
+		for tag in tags:
+			slugs.append (tag['slug'])
+
+		return slugs
+
 
 	# Get the nodes SSH hosts keys
 	def _get_node_ssh_keys (self, node_config):
@@ -594,28 +608,24 @@ class Netbox (object):
 		ips = self._query ("ipam/ip-addresses/?limit=0")
 
 		for ip in ips:
-			ip_iface = ip['interface']
 			# If this IP isn't bound to an interface, we don't care about it here
-			if not ip_iface:
+			if not ip['assigned_object']:
 				continue
-			ifname = ip_iface['name']
+
+			ifname = ip['assigned_object']['name']
 
 			# We only care for active IPs
-			status = ip['status']['label']
-			if status != "Active":
+			status = ip['status']['value']
+			if status != "active":
 				continue
 
 			prefix = ip['address']
 
-			node = None
-			if ip_iface['device']:
-				node = ip_iface['device']['display_name']
-			elif ip_iface['virtual_machine']:
-				node = ip_iface['virtual_machine']['name']
-			else:
-				raise NetboxError ("IP '%s' bound to unknown interface. This should not have happend. Ever. At all.")
-
 			# If the given node is not present in our nodes, we don't care about it
+			if 'device' in ip['assigned_object']:
+				node = ip['assigned_object']['device']['name']
+			else:
+				node = ip['assigned_object']['virtual_machine']['name']
 			if node not in nodes:
 				continue
 
