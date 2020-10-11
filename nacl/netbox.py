@@ -462,12 +462,18 @@ class Netbox (object):
 			if 'prefixes' not in iface:
 				iface['prefixes'] = []
 
+			# Evaluate tags
+			if iface_config['tags']:
+				iface_config['tags'] = self._get_tag_slugs (iface_config['tags'])
+
 			iface['has_gateway'] = 'gateway_iface' in iface_config['tags']
 
 			# Interface status
 			iface['status'] = 'active'
 			if 'planned' in iface_config['tags']:
 				iface['status'] = 'planned'
+			elif 'offline' in iface_config['tags']:
+				iface['status'] = 'offline'
 
 			# Make sure any static gateway has a worse metric than one learned via bird
 			if iface['has_gateway']:
@@ -476,10 +482,6 @@ class Netbox (object):
 			# Should we do DHCP?
 			if 'dhcp' in iface_config['tags']:
 				iface['method'] = 'dhcp'
-
-			# Evaluate tags
-			if iface_config['tags']:
-				iface_config['tags'] = self._get_tag_slugs (iface_config['tags'])
 
 			batman_connect_sites = []
 			for tag in iface_config['tags']:
