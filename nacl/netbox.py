@@ -104,15 +104,15 @@ class Netbox (object):
 			if not res:
 				return None
 
-			iface = res[0]['interface']
+			iface = res[0]['assigned_object']
 
 			# For VMs 'virtual_machine' is a dict, otherwise it's set but None
-			vm = iface['virtual_machine']
+			vm = iface.get ('virtual_machine', None)
 			if vm:
 				return ['virtual_machine', vm['id']]
 
 			# For devices 'device' is a dict, otherwise it's set but None
-			device = iface['device']
+			device = iface.get ('device', None)
 			if device:
 				return ['device', device['id']]
 		except IndexError:
