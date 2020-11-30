@@ -399,6 +399,17 @@ class Netbox (object):
 			# roles, sites, ifaces, monitoring, mailname, ...
 		}
 
+		tags = self._get_tag_slugs (node_config['tags'])
+
+		# Store tags for evaluation within Salt
+		node['tags'] = tags
+
+		# Process some tags with special meaning
+		if 'ifupdown-ng' in tags:
+			node['network'] = {
+				'suite' : 'ifupdown-ng',
+			}
+
 		# Merge in config_context data, IFF it doesn't overwrite anything
 		for key, value in node_config.get ('config_context', {}).items ():
 			# Those need special care
