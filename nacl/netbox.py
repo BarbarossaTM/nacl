@@ -392,7 +392,7 @@ class Netbox (object):
 			'ssh' : self._get_node_ssh_keys (node_config),
 			'id' : node_config['custom_fields'].get ('id', None),
 			'status' : node_config['status']['label'].lower (),
-			'location' : self._get_location_info (node_config['site']['id']),
+			'location' : self._get_location_info (node_config['site']['id'], node_config),
 			'sysLocation' : node_config['site']['name'],	# XXX DEPRECATED XXX
 			#
 			# Maybe in config_context:
@@ -728,20 +728,33 @@ class Netbox (object):
 		return res[0]['id']
 
 
-	def _get_location_info (self, site_id):
+	def _get_location_info (self, site_id, node_config):
 		site = self._query ("dcim/sites/%s" % site_id, True)
 		if not site:
 			return None
 
+		# Every device or VM has a site
 		location_info = {
-			'latitude' : site['latitude'],
-			'longitude' : site['longitude'],
 			'site' : {
 				'code' : site['name'],
 				'desc' : site['description'],
 			}
 		}
 
+		# Location override present in config context?
+		location_override = node_config['config_context'].get ('location_override')
+		if location_override:
+			if 'latitude' in location_override and 'longitude' in location_override:
+				location_info['latitude'] = location_override['latitude']
+				location_info['longitude'] = location_override['longitude']
+
+		# Use site coordinates, if present
+		elif site['latitude'] and site['longitude']:
+			location_info['latitude'] = site['latitude']
+			location_info['longitude'] = site['longitude']
+
+		# Does the site belong to a region?
+		# XXX What about nested regions?
 		if site['region']:
 			location_info['region'] = {
 				'code' : site['region']['slug'],
