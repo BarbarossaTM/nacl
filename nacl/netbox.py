@@ -344,7 +344,7 @@ class Netbox (object):
 
 		# Pimp interface configs wrt to LAGs and VLANs
 		for device, device_config in devices.items ():
-			ifaces = device_config['ifaces']
+			ifaces = device_config.get ('ifaces')
 			if ifaces:
 				self._update_bonding_config (ifaces)
 				self._update_vlan_config (ifaces)
@@ -378,7 +378,7 @@ class Netbox (object):
 
 		# Pimp interface configs wrt VLANs
 		for vm, vm_config in vms.items ():
-			ifaces = vm_config['ifaces']
+			ifaces = vm_config.get ('ifaces')
 			if ifaces:
 				self._update_vlan_config (ifaces)
 
@@ -444,6 +444,10 @@ class Netbox (object):
 			# about this interface either
 			if not node_config:
 				continue
+
+			# Make sure there is a ifaces dict present within this nodes config
+			if 'ifaces' not in node_config:
+				node_config['ifaces'] = {}
 
 			# Name of the interface we are dealing with
 			ifname = iface_config['name']
