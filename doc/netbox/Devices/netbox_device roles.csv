@@ -5,6 +5,7 @@ Core router,core-router,aa1409,True,Core/Border Router
 Core switch,core-switch,3f51b5,,L3-Switch
 CPE,cpe,795548,True,
 DNS-Server,dns-server,607d8b,True,
+Docker host,docker,607d8b,True,
 Gateway,gateway,ffc107,True,
 KVM-Host,kvm-host,111111,,
 Monitoring,monitoring,111111,True,
