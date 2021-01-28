@@ -1,4 +1,5 @@
 name,slug,weight,description
+B.A.T.M.A.N. DCI,b-a-t-m-a-n-dci,1000,Data Center Interconnect for B.A.T.M.A.N. devices
 B.A.T.M.A.N. IP,b-a-t-m-a-n-ip,1000,IP prefix transported within B.A.T.M.A.N.
 B.A.T.M.A.N. Mesh,b-a-t-m-a-n-mesh,1000,B.A.T.M.A.N. mesh protocol (Ethernet)
 External stuff/devices,external-stuffdevices,1000,
