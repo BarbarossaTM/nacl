@@ -1,7 +1,6 @@
 name,slug,manufacturer,napalm_driver,napalm_args,description
-AirOS,airos,Ubnt,,,
-EdgeOS,edgeos,Ubnt,,,
-IOS,ios,Cisco,,,
+AirOS,airos,Ubiquiti,,,
+EdgeOS,edgeos,Ubiquiti,,,
+IOS,ios,Cisco,ios,,
 Linux,linux,,,,
 Netonix,netonix,Netonix,,,
-TP-Link,tp-link,TP-Link,,,

@@ -1,3 +1,12 @@
+manufacturer: BTR
+model: DCCS
+slug: dccs
+part_number: ''
+u_height: 1
+is_full_depth: false
+subdevice_role: ''
+comments: ''
+---
 manufacturer: Cisco
 model: WS-C3560E-12D
 slug: ws-c3560e-12d
@@ -8,14 +17,14 @@ subdevice_role: ''
 comments: ''
 console-ports:
 - name: con0
-  type: ''
+  type: rj-45
 power-ports:
 - name: psu1
-  type: ''
+  type: iec-60320-c14
   maximum_draw: null
   allocated_draw: null
 - name: psu2
-  type: ''
+  type: iec-60320-c14
   maximum_draw: null
   allocated_draw: null
 interfaces:
@@ -238,9 +247,21 @@ model: WS-C4900M
 slug: ws-c4900m
 part_number: ''
 u_height: 2
-is_full_depth: false
-subdevice_role: ''
+is_full_depth: true
+subdevice_role: parent
 comments: "hw-module module m port-group p \r\nselect [gigabitethernet | tengigabitethernet]"
+console-ports:
+- name: con0
+  type: rj-45
+power-ports:
+- name: PS1
+  type: iec-60320-c14
+  maximum_draw: 960
+  allocated_draw: null
+- name: PS2
+  type: iec-60320-c14
+  maximum_draw: 960
+  allocated_draw: null
 interfaces:
 - name: Te1/1
   type: 10gbase-x-x2
@@ -266,6 +287,40 @@ interfaces:
 - name: Te1/8
   type: 10gbase-x-x2
   mgmt_only: false
+- name: Fa1
+  type: 100base-tx
+  mgmt_only: true
+---
+manufacturer: Dell
+model: PowerEdge R410
+slug: poweredge-r410
+part_number: ''
+u_height: 1
+is_full_depth: true
+subdevice_role: ''
+comments: ''
+console-ports:
+- name: ttyS0
+  type: de-9
+power-ports:
+- name: psu1
+  type: iec-60320-c14
+  maximum_draw: null
+  allocated_draw: null
+- name: psu2
+  type: iec-60320-c14
+  maximum_draw: null
+  allocated_draw: null
+interfaces:
+- name: eth0
+  type: 1000base-t
+  mgmt_only: false
+- name: eth1
+  type: 1000base-t
+  mgmt_only: false
+- name: lom
+  type: 100base-tx
+  mgmt_only: true
 ---
 manufacturer: Dell
 model: PowerEdge R610
@@ -307,26 +362,26 @@ interfaces:
   type: 100base-tx
   mgmt_only: true
 ---
-manufacturer: FS.com
-model: FMU-1UFMX-N
+manufacturer: FS
+model: FMU-1UFMX-N-Chassis
 slug: fmu-1ufmx-n
 part_number: FMU-1UFMX-N
 u_height: 1
 is_full_depth: false
 subdevice_role: parent
-comments: ''
+comments: "2-Slot 1U 19\u201D Rack-Chassis"
 device-bays:
 - name: '1'
 - name: '2'
 ---
-manufacturer: FS.com
-model: FMU-MC082745 -  8Ch-MUX 1270-1450 (Skip 1390,1410)
+manufacturer: FS
+model: FMU-MC082745-MUX
 slug: fmu-mc082745
 part_number: '42937'
 u_height: 0
 is_full_depth: false
 subdevice_role: child
-comments: ''
+comments: 8Ch-MUX 1270-1450 (Skip 1390,1410)
 front-ports:
 - name: '1270'
   type: lc
@@ -394,7 +449,7 @@ interfaces:
   mgmt_only: true
 ---
 manufacturer: Netonix
-model: WS12-250-AC
+model: WS-12-250-AC
 slug: ws12-250-ac
 part_number: ''
 u_height: 1
@@ -402,12 +457,12 @@ is_full_depth: false
 subdevice_role: ''
 comments: ''
 console-ports:
-- name: ttyS0
-  type: ''
+- name: Console
+  type: de-9
 power-ports:
-- name: power0
-  type: ''
-  maximum_draw: null
+- name: psu1
+  type: iec-60320-c14
+  maximum_draw: 250
   allocated_draw: null
 interfaces:
 - name: '1'
@@ -450,6 +505,105 @@ interfaces:
   type: 1000base-x-sfp
   mgmt_only: false
 - name: '14'
+  type: 1000base-x-sfp
+  mgmt_only: false
+- name: po1
+  type: lag
+  mgmt_only: false
+---
+manufacturer: Netonix
+model: WS-24-400A
+slug: ws-24-400a
+part_number: ''
+u_height: 1
+is_full_depth: false
+subdevice_role: ''
+comments: ''
+console-ports:
+- name: Console
+  type: de-9
+power-ports:
+- name: PSU1
+  type: iec-60320-c14
+  maximum_draw: 400
+  allocated_draw: null
+interfaces:
+- name: '1'
+  type: 1000base-t
+  mgmt_only: false
+- name: '2'
+  type: 1000base-t
+  mgmt_only: false
+- name: '3'
+  type: 1000base-t
+  mgmt_only: false
+- name: '4'
+  type: 1000base-t
+  mgmt_only: false
+- name: '5'
+  type: 1000base-t
+  mgmt_only: false
+- name: '6'
+  type: 1000base-t
+  mgmt_only: false
+- name: '7'
+  type: 1000base-t
+  mgmt_only: false
+- name: '8'
+  type: 1000base-t
+  mgmt_only: false
+- name: '9'
+  type: 1000base-t
+  mgmt_only: false
+- name: '10'
+  type: 1000base-t
+  mgmt_only: false
+- name: '11'
+  type: 1000base-t
+  mgmt_only: false
+- name: '12'
+  type: 1000base-t
+  mgmt_only: false
+- name: '13'
+  type: 1000base-t
+  mgmt_only: false
+- name: '14'
+  type: 1000base-t
+  mgmt_only: false
+- name: '15'
+  type: 1000base-t
+  mgmt_only: false
+- name: '16'
+  type: 1000base-t
+  mgmt_only: false
+- name: '17'
+  type: 1000base-t
+  mgmt_only: false
+- name: '18'
+  type: 1000base-t
+  mgmt_only: false
+- name: '19'
+  type: 1000base-t
+  mgmt_only: false
+- name: '20'
+  type: 1000base-t
+  mgmt_only: false
+- name: '21'
+  type: 1000base-t
+  mgmt_only: false
+- name: '22'
+  type: 1000base-t
+  mgmt_only: false
+- name: '23'
+  type: 1000base-t
+  mgmt_only: false
+- name: '24'
+  type: 1000base-t
+  mgmt_only: false
+- name: '25'
+  type: 1000base-x-sfp
+  mgmt_only: false
+- name: '26'
   type: 1000base-x-sfp
   mgmt_only: false
 ---
@@ -575,6 +729,9 @@ interfaces:
 - name: lo
   type: virtual
   mgmt_only: false
+- name: lom
+  type: 100base-tx
+  mgmt_only: true
 ---
 manufacturer: "Teleg\xE4rtner"
 model: Patchpanel
@@ -585,21 +742,7 @@ is_full_depth: false
 subdevice_role: ''
 comments: ''
 ---
-manufacturer: TP-Link
-model: T1700X-16TS
-slug: t1700x-16ts
-part_number: ''
-u_height: 1
-is_full_depth: false
-subdevice_role: ''
-comments: ''
-power-ports:
-- name: psu1
-  type: ''
-  maximum_draw: null
-  allocated_draw: null
----
-manufacturer: Ubnt
+manufacturer: Ubiquiti
 model: AirFiber-X AF-5X
 slug: airfiber-x-af-5x
 part_number: ''
@@ -615,7 +758,71 @@ interfaces:
   type: 1000base-t
   mgmt_only: true
 ---
-manufacturer: Ubnt
+manufacturer: Ubiquiti
+model: EdgePoint EP-S16
+slug: edgepoint-ep-s16
+part_number: ''
+u_height: 0
+is_full_depth: false
+subdevice_role: ''
+comments: ''
+interfaces:
+- name: '1'
+  type: 1000base-t
+  mgmt_only: false
+- name: '2'
+  type: 1000base-t
+  mgmt_only: false
+- name: '3'
+  type: 1000base-t
+  mgmt_only: false
+- name: '4'
+  type: 1000base-t
+  mgmt_only: false
+- name: '5'
+  type: 1000base-t
+  mgmt_only: false
+- name: '6'
+  type: 1000base-t
+  mgmt_only: false
+- name: '7'
+  type: 1000base-t
+  mgmt_only: false
+- name: '8'
+  type: 1000base-t
+  mgmt_only: false
+- name: '9'
+  type: 1000base-t
+  mgmt_only: false
+- name: '10'
+  type: 1000base-t
+  mgmt_only: false
+- name: '11'
+  type: 1000base-t
+  mgmt_only: false
+- name: '12'
+  type: 1000base-t
+  mgmt_only: false
+- name: '13'
+  type: 1000base-t
+  mgmt_only: false
+- name: '14'
+  type: 1000base-t
+  mgmt_only: false
+- name: '15'
+  type: 1000base-t
+  mgmt_only: false
+- name: '16'
+  type: 1000base-t
+  mgmt_only: false
+- name: '17'
+  type: 10gbase-x-sfpp
+  mgmt_only: false
+- name: '18'
+  type: 10gbase-x-sfpp
+  mgmt_only: false
+---
+manufacturer: Ubiquiti
 model: ER-X
 slug: er-x
 part_number: ''
@@ -640,7 +847,7 @@ interfaces:
   type: 1000base-t
   mgmt_only: false
 ---
-manufacturer: Ubnt
+manufacturer: Ubiquiti
 model: ER-X-SFP
 slug: er-x-sfp
 part_number: ''
@@ -668,7 +875,7 @@ interfaces:
   type: 1000base-x-sfp
   mgmt_only: false
 ---
-manufacturer: Ubnt
+manufacturer: Ubiquiti
 model: LBE-5AC-16-120
 slug: lbe-5ac-16-120
 part_number: ''
@@ -687,7 +894,7 @@ interfaces:
   type: ieee802.11ac
   mgmt_only: false
 ---
-manufacturer: Ubnt
+manufacturer: Ubiquiti
 model: NanoBeam M5 19
 slug: nanobeam-m5-19
 part_number: ''
@@ -709,7 +916,7 @@ interfaces:
   type: virtual
   mgmt_only: false
 ---
-manufacturer: Ubnt
+manufacturer: Ubiquiti
 model: NBE-5AC-19
 slug: nbe-5ac-19
 part_number: ''
@@ -731,7 +938,7 @@ interfaces:
   type: ieee802.11ac
   mgmt_only: false
 ---
-manufacturer: Ubnt
+manufacturer: Ubiquiti
 model: PBE-5AC-300
 slug: pbe-5ac-300
 part_number: ''
@@ -753,7 +960,7 @@ interfaces:
   type: sonet-oc3
   mgmt_only: false
 ---
-manufacturer: Ubnt
+manufacturer: Ubiquiti
 model: PBE-5AC-500
 slug: pbe-5ac-500
 part_number: ''
@@ -775,7 +982,7 @@ interfaces:
   type: sonet-oc3
   mgmt_only: false
 ---
-manufacturer: Ubnt
+manufacturer: Ubiquiti
 model: PBE-5AC-Gen2
 slug: pbe-5ac-gen2
 part_number: ''
@@ -797,7 +1004,7 @@ interfaces:
   type: sonet-oc3
   mgmt_only: false
 ---
-manufacturer: Ubnt
+manufacturer: Ubiquiti
 model: Surge Protector
 slug: surge-protector
 part_number: ''
@@ -815,7 +1022,7 @@ rear-ports:
   type: 8p8c
   positions: 1
 ---
-manufacturer: Ubnt
+manufacturer: Ubiquiti
 model: UAP-AC-Lite
 slug: uap-ac-lite
 part_number: ''
@@ -831,7 +1038,7 @@ interfaces:
   type: 1000base-t
   mgmt_only: false
 ---
-manufacturer: Ubnt
+manufacturer: Ubiquiti
 model: UAP-AC-M
 slug: uap-ac-m
 part_number: ''
@@ -847,7 +1054,7 @@ interfaces:
   type: 1000base-t
   mgmt_only: false
 ---
-manufacturer: Ubnt
+manufacturer: Ubiquiti
 model: UAP-AC-M-Pro
 slug: uap-ac-m-pro
 part_number: ''
@@ -860,5 +1067,18 @@ interfaces:
   type: 1000base-t
   mgmt_only: false
 - name: lan1
+  type: 1000base-t
+  mgmt_only: false
+---
+manufacturer: Ubiquiti
+model: UAP pro
+slug: uap-pro
+part_number: ''
+u_height: 0
+is_full_depth: false
+subdevice_role: ''
+comments: ''
+interfaces:
+- name: eth0
   type: 1000base-t
   mgmt_only: false
