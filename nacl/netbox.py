@@ -483,6 +483,9 @@ class Netbox (object):
 
 			iface['has_gateway'] = 'gateway_iface' in iface_config['tags']
 
+			if 'vrf_external' in iface_config['tags']:
+				iface['vrf'] = 'vrf_external'
+
 			# Interface status
 			iface['status'] = 'active'
 			if 'planned' in iface_config['tags']:
