@@ -6,6 +6,7 @@
 
 import argparse
 import logging
+import os.path
 import sys
 from werkzeug.serving import run_simple
 
@@ -14,7 +15,7 @@ from nacl.app import Nacl
 
 # Parse command line arguments
 parser = argparse.ArgumentParser (description = 'Netbox Automation and Caching Layer for FFHO Salt')
-parser.add_argument ('--config', '-c', help = 'Path to config file (json format)', default = 'nacl_config.json')
+parser.add_argument ('--config', '-c', help = 'Path to config file (json format)')
 parser.add_argument ('--debug', '-D', help = 'Activate werkzeug debugger', action = 'store_true')
 parser.add_argument ('--reload', '-R', help = 'Activate werkzeug reloader', action = 'store_true')
 parser.add_argument ('--listen', help = 'Local address to listen on.', default = '127.0.0.1')
@@ -23,6 +24,20 @@ parser.add_argument ('--log-level', help = "Log level", choices = ['debug', 'inf
 parser.add_argument ('--log-file', help = "Path to log file, - for stdout (default)", default = '-')
 
 args = parser.parse_args ()
+
+#
+# Default config file paths
+#
+default_configs = [
+	'nacl_config.json',
+	'/etc/nacl/nacl_config.json'
+]
+
+if not getattr (args, 'config'):
+	for path in default_configs:
+		if os.path.isfile (path):
+			setattr (args, 'config', path)
+			break
 
 #
 # Set up logging
