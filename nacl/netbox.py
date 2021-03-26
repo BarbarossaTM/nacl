@@ -483,8 +483,20 @@ class Netbox (object):
 
 			iface['has_gateway'] = 'gateway_iface' in iface_config['tags']
 
+			# Set VRF for interface without IPs
 			if 'vrf_external' in iface_config['tags']:
 				iface['vrf'] = 'vrf_external'
+
+			# If this interface is used for PPPoE, store it as pppoe interface of the node
+			if 'pppoe' in iface_config['tags']:
+				if 'pppoe' not in node_config:
+					node_config['pppoe'] = {}
+
+				node_config['pppoe']['iface'] = ifname
+
+				# Ignore this interface for further processing and thereby do NOT
+				# generate an interface stanza in /etc/network/interfaces
+				continue
 
 			# Interface status
 			iface['status'] = 'active'
