@@ -47,6 +47,24 @@ mesh_breakout_re = re.compile (r'^mesh_breakout_(.*)$')
 # ospf_cost_<cost>
 ospf_cost_re = re.compile (r'^ospf_cost_([0-9]+)$')
 
+################################################################################
+#                                  Helpers                                     #
+################################################################################
+
+def get_parent_iface (iface_config):
+	# "parent": null,
+	if not iface_config['parent']:
+		return
+
+	# "parent": {
+	#	"id": 322,
+	#	"display": "bond0",
+	#	"device" : { ... },
+	#	"name": "bond0"
+	#	...
+	# }
+	return iface_config['parent']['name']
+
 
 
 class Netbox (object):
@@ -241,53 +259,6 @@ class Netbox (object):
 				del interfaces[member]
 
 
-	def _update_vlan_config (self, interfaces):
-		raw_devices = {}
-		vlan_devices = {}
-		tagged_all_iface = None
-
-		# Gather devices with tagges VLANs and VLAN interfaces
-		for ifname, iface_config in interfaces.items ():
-			# Interface with explicit tagged VLANs
-			tagged_vlans = iface_config.get ('tagged_vlans', None)
-			if tagged_vlans:
-				raw_devices[ifname] = tagged_vlans
-
-			# Interfacee in Tagged All mode
-			if iface_config.get ('vlan_mode') == "tagged-all":
-				tagged_all_iface = ifname
-				del iface_config['vlan_mode']
-
-			# Vlan interface (identified by name)
-			if ifname.startswith ('vlan'):
-				# If there's already a vlan-raw-device set, just move on
-				if 'vlan-raw-device' in iface_config:
-					continue
-
-				# There should only be one interface with Tagged All mode on a Linux box
-				vlan_devices[ifname] = iface_config
-
-		# Check if there are corresponding VLAN interface for explicitly configured VLANs
-		for raw_device in sorted (raw_devices):
-			for vlan in raw_devices[raw_device]:
-				ifname = "vlan%s" % vlan
-
-				# If there's no vlan<vid>, there's nuthin' we could do
-				if ifname not in vlan_devices:
-					continue
-
-				vlan_devices[ifname]['vlan-raw-device'] = raw_device
-
-		# Fall back to Tagged All interface as vlan-raw-device if non has been found yet
-		if tagged_all_iface:
-			for ifname, iface_config in vlan_devices.items ():
-				# If there's already a vlan-raw-device set, just move on
-				if 'vlan-raw-device' in iface_config:
-					continue
-
-				iface_config['vlan-raw-device'] = tagged_all_iface
-
-
 	# Get primary IPv4 and IPv6 address/plen, if set
 	def _get_primary_ips (self, node_config):
 		ips = {}
@@ -347,7 +318,6 @@ class Netbox (object):
 			ifaces = device_config.get ('ifaces')
 			if ifaces:
 				self._update_bonding_config (ifaces)
-				self._update_vlan_config (ifaces)
 
 		return devices
 
@@ -375,12 +345,6 @@ class Netbox (object):
 			vms[name] = vm
 
 		self._get_interfaces (vms, 'vm')
-
-		# Pimp interface configs wrt VLANs
-		for vm, vm_config in vms.items ():
-			ifaces = vm_config.get ('ifaces')
-			if ifaces:
-				self._update_vlan_config (ifaces)
 
 		return vms
 
@@ -546,9 +510,11 @@ class Netbox (object):
 			if batman_connect_sites:
 				iface['batman_connect_sites'] = batman_connect_sites
 
-			# Store 802.1Q mode
-			if iface_config['mode']:
-				iface['vlan_mode'] = iface_config['mode']['value']
+			# Try to figure out if this iface is an 802.1q vlan interface
+			# and - if so - which interface is the vlan-raw-device.
+			parent_iface = get_parent_iface (iface_config)
+			if parent_iface and (ifname.startswith ('vlan') or '.' in ifname):
+				iface['vlan-raw-device'] = parent_iface
 
 			# IF there are any defaults for this interface, apply them
 			try:
