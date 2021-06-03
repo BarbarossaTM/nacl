@@ -112,10 +112,16 @@ class Nacl (object):
 	def get_pillar_info (self, minion_id):
 		nodes = self.netbox.get_nodes ()
 
-		# Filter out and private keys which are not for <minion_id>
+		# Filter out any private keys which are not for <minion_id>
 		for node, node_config in nodes.items ():
 			if node != minion_id:
 				_remove_private_keys (node, node_config)
+
+			# Remove burp specific config if this node_config isn't for <minion_id>
+			# nor <burp_server>
+			if "burp" in node_config:
+				if node != minion_id and node not in self.config['services']['burp']['servers']:
+					del node_config['burp']
 
 		return nodes
 
