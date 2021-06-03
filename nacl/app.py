@@ -123,6 +123,23 @@ class Nacl (object):
 				if node != minion_id and node not in self.config['services']['burp']['servers']:
 					del node_config['burp']
 
+			# Remove any subdicts from node_config if _nacl_visibility_ is present,
+			# set to 'node' and this node_config is not for <minion_id>
+			keys_to_delete = []
+			for key, item in node_config.items ():
+				if type (item) == dict and '_nacl_visibility_' in item:
+					nv = item['_nacl_visibility_']
+
+					# If this subsection should only be visibly for the corresponding node
+					# which is different to <minion_id>, mark this subsection to be removed.
+					if nv == "node" and node != minion_id:
+						keys_to_delete.append (key)
+
+					del node_config[key]['_nacl_visibility_']
+
+			for key in keys_to_delete:
+				del node_config[key]
+
 		return nodes
 
 
