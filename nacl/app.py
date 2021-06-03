@@ -64,6 +64,14 @@ def _remove_private_keys (node, node_config):
 	except KeyError:
 		pass
 
+	# Remove fastd private keys
+	try:
+		del node_config['fastd']['intergw_privkey']
+		# If intergw_privkey isn't present, nodes_privkey won't either
+		del node_config['fastd']['nodes_privkey']
+	except KeyError:
+		pass
+
 
 class Nacl (object):
 	def __init__ (self, config_file):
