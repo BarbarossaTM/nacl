@@ -462,6 +462,10 @@ class Netbox (object):
 				# generate an interface stanza in /etc/network/interfaces
 				continue
 
+			# ppp interfaces are started by other means for now - FIXME
+			if ifname == 'ppp0':
+				iface['auto'] = False
+
 			# Interface status
 			iface['status'] = 'active'
 			if 'planned' in iface_config['tags']:
