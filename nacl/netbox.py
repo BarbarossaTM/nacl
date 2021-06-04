@@ -181,7 +181,7 @@ class Netbox (object):
 
 
 	def _unfuck_crypto_key (self, key):
-		# Fix line breaks in private keys
+		# Fix line breaks in crypto keys
 		fixed_key = ""
 		for word in key.split ():
 			fixed_key += word
@@ -593,12 +593,19 @@ class Netbox (object):
 				if cn == 'host':
 					key = node_name
 
-				certs[key] = {
-					'cert': self._unfuck_crypto_key (node_config['config_context']['ssl'][cn]['cert']),
-					'privkey': self._unfuck_crypto_key (node_config['config_context']['ssl'][cn]['key']),
-				}
-		except KeyError:
-			return {}
+				try:
+					certs[key] = {
+						'cert': self._unfuck_crypto_key (node_config['config_context']['ssl'][cn]['cert']),
+						'privkey': self._unfuck_crypto_key (node_config['config_context']['ssl'][cn]['key']),
+					}
+				except KeyError:
+					pass
+
+				# FIXME: This will probably go somewhere else and may be better up in Salt pillar?
+				if 'install' in node_config['config_context']['ssl'][cn]:
+					certs[key] = {
+						"install" : node_config['config_context']['ssl'][cn]["install"]
+					}
 		except Exception as e:
 			raise NetboxError ("Failed to gather SSL certs for node '%s': %s" % (node_name, e))
 
