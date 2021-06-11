@@ -27,7 +27,7 @@ valid_ssh_key_types = [
 ]
 
 # Interface attributes we care about...
-interface_attrs = ['mac_address', 'mtu', 'tagged_vlans', 'untagged_vlan', 'description', 'lag']
+interface_attrs = ['mac_address', 'mtu', 'tagged_vlans', 'untagged_vlan', 'description']
 # ... and their names for us
 interface_attr_map = {
 	'mac_address' : 'mac',
@@ -241,11 +241,10 @@ class Netbox (object):
 		bonds = {}
 
 		for ifname, iface_config in interfaces.items ():
-			lag_config = iface_config.get ('lag', None)
-			if not lag_config:
+			lag = iface_config.get ('lag', None)
+			if not lag:
 				continue
 
-			lag = lag_config['name']
 			if lag not in bonds:
 				bonds[lag] = []
 
@@ -512,6 +511,10 @@ class Netbox (object):
 			# Any VXLAN overlays found?
 			if batman_connect_sites:
 				iface['batman_connect_sites'] = batman_connect_sites
+
+			# Is this interface part of a LAG?
+			if iface_config.get ('lag'):
+				iface['lag'] = iface_config['lag']['name']
 
 			# Try to figure out if this iface is an 802.1q vlan interface
 			# and - if so - which interface is the vlan-raw-device.
