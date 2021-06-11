@@ -256,7 +256,7 @@ class Netbox (object):
 
 			# On Linux we don't need interface config stazas for bond members
 			for member in bonds[bond]:
-				del interfaces[member]
+				interfaces[member]['enabled'] = False
 
 
 	# Get primary IPv4 and IPv6 address/plen, if set
@@ -393,10 +393,6 @@ class Netbox (object):
 			ifaces = self._query ("virtualization/interfaces/?limit=0")
 
 		for iface_config in ifaces:
-			# Ignore interfaces which are not enabled
-			if not iface_config.get ('enabled', False):
-				continue
-
 			# Netbox has two calles for interfaces, one for "devices" (something you can touch)
 			# and VMs (something running in the cloud, maybe on prem, maybe not) which both kind
 			# of show all interfaces, but not all with all information.. So we have to distinguish
@@ -437,6 +433,9 @@ class Netbox (object):
 			# There may be a (partial) ifaces dict present already when set via confix_context.
 			# If so, we use it as base
 			iface = node_config['ifaces'].get (ifname, {})
+
+			# Store interface enabled flag
+			iface['enabled'] = iface_config['enabled']
 
 			if 'prefixes' not in iface:
 				iface['prefixes'] = []
