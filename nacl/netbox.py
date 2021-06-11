@@ -528,6 +528,11 @@ class Netbox (object):
 			except KeyError:
 				pass
 
+			# Any custom attributes?
+			for key, value in iface_config['custom_fields'].items ():
+				if value:
+					iface[key] = value
+
 			# Store iface config to device
 			node_config['ifaces'][ifname] = iface
 
