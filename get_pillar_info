@@ -7,7 +7,7 @@ import sys
 import nacl.netbox
 
 parser = argparse.ArgumentParser ()
-parser.add_argument ('--config', '-c', help = "Path to 'nacl_config.json'", default = './nacl_config.json')
+parser.add_argument ('--config', '-c', help = "Path to 'nacl_config.json'", default = '/etc/nacl/nacl_config.json')
 parser.add_argument ('--all', '-a', action = 'store_true', help = 'Print all nodes')
 parser.add_argument ('--node', '-n', help = 'Only show given node')
 args = parser.parse_args ()
@@ -21,6 +21,7 @@ try:
 		config = json.load (config_fh)
 except IOError as i:
 	print ("Failed to read config from '%s': %s" % (args.config, str (i)))
+	sys.exit (1)
 
 netbox = nacl.netbox.Netbox (config['netbox'], {}, {})
 
