@@ -15,3 +15,15 @@ This can be done by creating a new Custom Link with
  * New window: `checked`
  * Link text: `{% if obj.device_role.slug == 'wbbl' %}WebUI{% endif %}` to only show this link for WBBL devices
  * Link URL `https://{{ obj.primary_ip4.address.ip }}` to directly point to the devices WebUI
+
+### Use the same link for multiple devices
+
+To use the same link for multiple devices it's either possible to check for different things and 'or' the conditions or for example to check for certain platforms:
+
+  {% if obj.platform.name in [ 'AirOS', 'Netonix' ] %}
+  WebUI
+  {% endif %}
+
+As there may be multiple roles for devices of a given type or platform it seems better to check for the platforms of devices where this link should apply.
+
+More details can be found at https://blog.sdn.clinic/2021/09/custom-links-in-netbox-shortcut-to-device-webuiipmi/
