@@ -295,7 +295,7 @@ class Netbox (object):
 		devices = {}
 
 		for device_config in self._query ("dcim/devices/?limit=0&platform=linux"):
-			name = device_config['display_name']
+			name = device_config['display']
 
 			device = {
 				'hardware' : True,
@@ -400,7 +400,7 @@ class Netbox (object):
 				if not iface_config['device']:
 					continue
 
-				node_name = iface_config['device']['display_name']
+				node_name = iface_config['device']['display']
 				node_config = nodes.get (node_name, None)
 
 			else:
@@ -585,13 +585,13 @@ class Netbox (object):
 				},
 			}
 		except Exception:
-			name = node_config.get ('display_name', node_config.get ('name'))
+			name = node_config.get ('display', node_config.get ('name'))
 			raise NetboxError ("SSH keys missing in config_context of node '%s'" % name)
 
 
 	# Get the nodes SSL certificate
 	def _get_node_ssl_certs (self, node_config):
-		node_name = node_config.get ('display_name', node_config.get ('name'))
+		node_name = node_config.get ('display', node_config.get ('name'))
 		certs = {}
 
 		try:
