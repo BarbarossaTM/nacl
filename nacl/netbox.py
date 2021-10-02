@@ -54,7 +54,7 @@ ospf_cost_re = re.compile (r'^ospf_cost_([0-9]+)$')
 def get_parent_iface (iface_config):
 	# "parent": null,
 	if not iface_config['parent']:
-		return
+		return None
 
 	# "parent": {
 	#	"id": 322,
