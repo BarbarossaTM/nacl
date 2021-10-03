@@ -54,7 +54,7 @@ ospf_cost_re = re.compile (r'^ospf_cost_([0-9]+)$')
 def get_parent_iface (iface_config):
 	# "parent": null,
 	if not iface_config['parent']:
-		return
+		return None
 
 	# "parent": {
 	#	"id": 322,
@@ -286,6 +286,9 @@ class Netbox (object):
 
 		# If we're still here, all names were unique. Let's merge in IPs then
 		self._store_ip_addresses (nodes)
+
+		# Query and store all services
+		self._store_services (nodes)
 
 		return nodes
 
@@ -550,6 +553,38 @@ class Netbox (object):
 					continue
 
 				iface[our_key] = iface_config[key]
+
+
+	# Query all services from Netbox and store them at the corresponding node
+	def _store_services (self, nodes):
+		services = self._query ("ipam/services/?limit=0")
+		for srv in services:
+			if srv['virtual_machine']:
+				node_name = srv['virtual_machine']['name']
+			else:
+				node_name = srv['device']['name']
+
+			node = nodes.get (node_name)
+			if not node:
+				continue
+
+			if not 'services' in node:
+				node['services'] = []
+
+			name = srv['name']
+			if srv['description']:
+				name += " - " + srv['description']
+
+			node['services'].append ({
+				'descr': name,
+				'ports': srv['ports'],
+				'proto': srv['protocol']['value'],
+				'ips' : {
+					4: [ip['address'] for ip in srv['ipaddresses'] if ip['family'] == 4],
+					6: [ip['address'] for ip in srv['ipaddresses'] if ip['family'] == 6],
+				},
+				'acl' : srv['custom_fields'].get ('service_acl'),
+			})
 
 	# Tags are now represented as a list containing dicts, one for each tag.
 	# The dict contains the 'name', 'slug', etc.
