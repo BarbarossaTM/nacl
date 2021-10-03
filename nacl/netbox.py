@@ -571,9 +571,12 @@ class Netbox (object):
 			if not 'services' in node:
 				node['services'] = []
 
+			name = srv['name']
+			if srv['description']:
+				name += " - " + srv['description']
+
 			node['services'].append ({
-				'name': srv['name'],
-				'desc': srv['description'],
+				'descr': name,
 				'ports': srv['ports'],
 				'proto': srv['protocol']['value'],
 				'ips' : {
