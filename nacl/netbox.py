@@ -584,6 +584,7 @@ class Netbox (object):
 					6: [ip['address'] for ip in srv['ipaddresses'] if ip['family'] == 6],
 				},
 				'acl' : srv['custom_fields'].get ('service_acl'),
+				'additional_prefixes' : srv['custom_fields'].get ('service_acl_additional_prefixes'),
 			})
 
 	# Tags are now represented as a list containing dicts, one for each tag.
