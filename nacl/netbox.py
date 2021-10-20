@@ -580,8 +580,8 @@ class Netbox (object):
 				'ports': srv['ports'],
 				'proto': srv['protocol']['value'],
 				'ips' : {
-					4: [ip['address'] for ip in srv['ipaddresses'] if ip['family'] == 4],
-					6: [ip['address'] for ip in srv['ipaddresses'] if ip['family'] == 6],
+					4: [ip['address'].split ('/')[0] for ip in srv['ipaddresses'] if ip['family'] == 4],
+					6: [ip['address'].split ('/')[0] for ip in srv['ipaddresses'] if ip['family'] == 6],
 				},
 				'acl' : srv['custom_fields'].get ('service_acl'),
 				'additional_prefixes' : srv['custom_fields'].get ('service_acl_additional_prefixes'),
