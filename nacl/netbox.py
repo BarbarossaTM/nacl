@@ -66,6 +66,22 @@ def get_parent_iface (iface_config):
 	return iface_config['parent']['name']
 
 
+# Group a list of ports (integers) into ranges
+def _group_ports (port_list):
+	ranges = []
+	numbers = sorted (map (int, port_list))
+	prev = min (port_list)
+
+	for n in numbers:
+		if n == prev + 1:
+			ranges[-1].append (n)
+		else:
+			ranges.append ([n])
+
+		prev = n
+
+	return ["%d-%d" % (r[0], r[-1]) if len (r) > 1 else str (r[0]) for r in ranges]
+
 
 class Netbox (object):
 	def __init__ (self, config, blueprints, defaults):
@@ -577,7 +593,7 @@ class Netbox (object):
 
 			node['services'].append ({
 				'descr': name,
-				'ports': srv['ports'],
+				'ports': _group_ports (srv['ports']),
 				'proto': srv['protocol']['value'],
 				'ips' : {
 					4: [ip['address'].split ('/')[0] for ip in srv['ipaddresses'] if ip['family'] == 4],
