@@ -500,6 +500,12 @@ class Netbox (object):
 			if 'dhcp' in iface_config['tags']:
 				iface['method'] = 'dhcp'
 
+			# Should uRPF be (de)activated explicitly?
+			if 'urpf-enable' in iface_config['tags']:
+				iface['urpf'] = True
+			elif 'urpf-disable' in iface_config['tags']:
+				iface['urpf'] = False
+
 			batman_connect_sites = []
 			for tag in iface_config['tags']:
 				# Should we set up VXLAN overlays for B.A.T.M.A.N.?
