@@ -120,7 +120,7 @@ class Nacl (object):
 			# Remove burp specific config if this node_config isn't for <minion_id>
 			# nor <burp_server>
 			if "burp" in node_config:
-				if node != minion_id and node not in self.config['services']['burp']['servers']:
+				if node != minion_id and minion_id not in self.config['services']['burp']['servers']:
 					del node_config['burp']
 
 			# Remove any subdicts from node_config if _nacl_visibility_ is present,
