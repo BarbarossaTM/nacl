@@ -6,6 +6,7 @@
 
 import json
 import os
+import re
 
 from nacl.errors import *
 import nacl.netbox
@@ -71,6 +72,67 @@ def _remove_private_keys (node, node_config):
 		del node_config['fastd']['nodes_privkey']
 	except KeyError:
 		pass
+
+
+def _generate_ibgp_peers (nodes, node_id):
+	peers = {
+		4: [],
+		6: [],
+	}
+
+	AFs = []
+
+	our_roles = nodes[node_id].get ('roles', [])
+	# If we aren't a router there's nothing to do here
+	if not 'router' in our_roles:
+		return None
+
+	# Check which AFs we support (for what AFs we have a primary/loopback IP)
+	for af in [ 4, 6 ]:
+		if af in nodes[node_id]['primary_ips']:
+			AFs.append (af)
+
+	# If we don't support any AF, there's nothing to be done here
+	if not AFs:
+		return None
+
+	for node in sorted (nodes.keys ()):
+		if node == node_id:
+			continue
+
+		peer_node_config = nodes[node]
+
+		# If this node isn't a router it won't be a peer
+		peer_roles = peer_node_config.get ('roles', [])
+		if not 'router' in peer_roles:
+			continue
+
+		# Carry on if neither we nor the peer are a RR
+		if 'routereflector' not in our_roles and 'routereflector' not in peer_roles:
+			continue
+
+		# Don't try to set up sessions to VMs/devices which are "planned", "failed", "decomissioning" and "inventory"
+		if peer_node_config.get ('status', '') not in [ '', 'active', 'staged', 'offline' ]:
+			continue
+
+		for af in AFs:
+			# Only generate a session for this AF if the peer has a primary IP for it
+			if af not in peer_node_config['primary_ips']:
+				continue
+
+			peer_config = {
+				# mangle . and - to _ to make bird happy
+				'node' : re.sub ('[.-]', '_', node),
+				'ip' : peer_node_config['primary_ips'][af].split ('/')[0],
+				'rr_client' : False,
+			}
+
+			if 'routereflector' in our_roles and not 'routereflector' in peer_roles:
+				peer_config['rr_client'] = True
+
+			peers[af].append (peer_config)
+
+	return peers
 
 
 class Nacl (object):
@@ -139,6 +201,15 @@ class Nacl (object):
 
 			for key in keys_to_delete:
 				del node_config[key]
+
+		if minion_id in nodes:
+			nodes[minion_id]['routing'] = {
+				'bgp' : {
+					'internal' : {
+						'peers' : _generate_ibgp_peers (nodes, minion_id),
+					},
+				},
+			}
 
 		return nodes
 
