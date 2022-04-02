@@ -506,6 +506,13 @@ class Netbox (object):
 			elif 'urpf-disable' in iface_config['tags']:
 				iface['urpf'] = False
 
+			# Is this a Wireguard tunnel?
+			if 'wireguard' in iface_config['tags']:
+				# For now we configure the tunnel config manually as there's no nice way
+				# to place those information/relations in Netbox. This might be the thing
+				# to move to Nautobot and leverage custom relations for this.
+				iface['wireguard'] = {}
+
 			batman_connect_sites = []
 			for tag in iface_config['tags']:
 				# Should we set up VXLAN overlays for B.A.T.M.A.N.?

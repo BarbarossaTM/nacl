@@ -73,6 +73,12 @@ def _remove_private_keys (node, node_config):
 	except KeyError:
 		pass
 
+	# Remove Wireguard private keys
+	try:
+		del node_config['wireguard']['privkey']
+	except KeyError:
+		pass
+
 
 def _generate_ibgp_peers (nodes, node_id):
 	peers = {
