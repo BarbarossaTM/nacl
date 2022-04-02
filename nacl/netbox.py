@@ -279,11 +279,11 @@ class Netbox (object):
 		ips = {}
 
 		if node_config['primary_ip4']:
-			ips[4] = node_config['primary_ip4']['address']
+			ips['4'] = node_config['primary_ip4']['address']
 			ips['v4'] = node_config['primary_ip4']['address']
 
 		if node_config['primary_ip6']:
-			ips[6] = node_config['primary_ip6']['address']
+			ips['6'] = node_config['primary_ip6']['address']
 			ips['v6'] = node_config['primary_ip6']['address']
 
 		return ips
