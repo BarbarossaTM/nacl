@@ -422,17 +422,16 @@ class Netbox (object):
 					continue
 
 				node_name = iface_config['device']['name']
-				node_config = nodes.get (node_name, None)
 
 			else:
 				if not iface_config['virtual_machine']:
 					continue
 
 				node_name = iface_config['virtual_machine']['name']
-				node_config = nodes.get (node_name, None)
 
 			# If we didn't find the node, we seem to not care about it, so there's no point in caring
 			# about this interface either
+			node_config = nodes.get (node_name, None)
 			if not node_config:
 				continue
 
