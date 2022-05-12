@@ -507,10 +507,17 @@ class Netbox (object):
 
 			# Is this a Wireguard tunnel?
 			if 'wireguard' in iface_config['tags']:
-				# For now we configure the tunnel config manually as there's no nice way
-				# to place those information/relations in Netbox. This might be the thing
-				# to move to Nautobot and leverage custom relations for this.
-				iface['wireguard'] = {}
+				peer = None
+
+				for cf in ['wg_peer_device', 'wg_peer_vm']:
+					if cf in iface_config['custom_fields'] and iface_config['custom_fields'][cf]:
+						peer = iface_config['custom_fields'][cf]['name']
+
+					del iface_config['custom_fields'][cf]
+
+				iface['wireguard'] = {
+					'peer' : peer,
+				}
 
 			batman_connect_sites = []
 			for tag in iface_config['tags']:
