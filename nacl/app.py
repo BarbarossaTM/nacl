@@ -199,7 +199,6 @@ def _generate_wireguard_config (nodes, minion_id):
 			mode = 'server'
 
 		tunnels[iface] = {
-			'local_privkey' : node_privkey,
 			'peer_fqdn' : peer_fqdn,
 			'peer_pubkey' : peer_pubkey,
 			'peer_ip' : peer_ip,
@@ -207,7 +206,13 @@ def _generate_wireguard_config (nodes, minion_id):
 			'mode' : mode,
 		}
 
-	return tunnels
+	if tunnels:
+		return {
+			'privkey' : node_privkey,
+			'tunnels' : tunnels,
+		}
+
+	return None
 
 
 class Nacl (object):
