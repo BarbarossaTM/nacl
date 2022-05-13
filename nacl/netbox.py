@@ -470,6 +470,10 @@ class Netbox (object):
 			if 'vrf_external' in iface_config['tags']:
 				iface['vrf'] = 'vrf_external'
 
+			# Dummy interface?
+			if 'dummy' in iface_config['tags']:
+				iface['link-type'] = 'dummy'
+
 			# If this interface is used for PPPoE, store it as pppoe interface of the node
 			if 'pppoe' in iface_config['tags']:
 				if 'pppoe' not in node_config:
