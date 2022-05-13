@@ -194,8 +194,8 @@ def _generate_wireguard_config (nodes, minion_id):
 
 		# If we are a core router and the peer is too, the one with the lower ID is server
 		local_match = re.search ('^cr(\d+).*$', minion_id)
-		peer_match = re.search ('^cr(\d+).*$', minion_id)
-		if local_match and peer_match and local_match.group (1) < peer_match.group (1):
+		peer_match = re.search ('^cr(\d+).*$', peer_fqdn)
+		if local_match and peer_match and int (local_match.group (1)) < int (peer_match.group (1)):
 			mode = 'server'
 
 		tunnels[iface] = {
