@@ -459,9 +459,10 @@ class Netbox (object):
 			if 'prefixes' not in iface:
 				iface['prefixes'] = []
 
-			# Evaluate tags
+			# Translate tags and store them, if present
+			iface_config['tags'] = self._get_tag_slugs (iface_config['tags'])
 			if iface_config['tags']:
-				iface_config['tags'] = self._get_tag_slugs (iface_config['tags'])
+				iface['tags'] = iface_config['tags']
 
 			iface['has_gateway'] = 'gateway_iface' in iface_config['tags']
 
