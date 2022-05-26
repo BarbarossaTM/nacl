@@ -274,6 +274,30 @@ class Netbox (object):
 				interfaces[member]['enabled'] = False
 
 
+	def _update_bridge_config (self, interfaces):
+		bridges = {}
+
+		for ifname, iface_config in interfaces.items ():
+			br = iface_config.get ('member-of-bridge')
+			if not br:
+				continue
+
+			# Make sure we don't expose this
+			del iface_config['member-of-bridge']
+
+			if br not in bridges:
+				bridges[br] = []
+
+			bridges[br].append (ifname)
+
+		for br in bridges:
+			# As VM interface don't have a type we may not have added this yet, D'oh
+			if not 'bridge-ports' in interfaces[br]:
+				interfaces[br]['bridge-ports'] = []
+
+			interfaces[br]['bridge-ports'] = sorted (interfaces[br]['bridge-ports'] + bridges[br])
+
+
 	# Get primary IPv4 and IPv6 address/plen, if set
 	def _get_primary_ips (self, node_config):
 		ips = {}
@@ -338,6 +362,7 @@ class Netbox (object):
 			ifaces = device_config.get ('ifaces')
 			if ifaces:
 				self._update_bonding_config (ifaces)
+				self._update_bridge_config (ifaces)
 
 		return devices
 
@@ -470,6 +495,15 @@ class Netbox (object):
 			if 'vrf_external' in iface_config['tags']:
 				iface['vrf'] = 'vrf_external'
 
+			# Store interface type, if present, and not virtual
+			if 'type' in iface_config:
+				if_type = iface_config['type']['value']
+				if if_type != 'virtual':
+					iface['type'] = if_type
+
+				if if_type == 'bridge':
+					iface['bridge-ports'] = []
+
 			# Dummy interface?
 			if 'dummy' in iface_config['tags']:
 				iface['link-type'] = 'dummy'
@@ -560,6 +594,10 @@ class Netbox (object):
 			# Is this interface part of a LAG?
 			if iface_config.get ('lag'):
 				iface['lag'] = iface_config['lag']['name']
+
+			# Is this interface member of a bridge?
+			if iface_config.get ('bridge'):
+				iface['member-of-bridge'] = iface_config['bridge']['name']
 
 			# Try to figure out if this iface is an 802.1q vlan interface
 			# and - if so - which interface is the vlan-raw-device.
