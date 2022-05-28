@@ -66,6 +66,22 @@ def get_parent_iface (iface_config):
 	return iface_config['parent']['name']
 
 
+def gen_vm_host_config_for_iface (ifname, iface_cfg, raw_config):
+	# If this iface has a parent it isn't exposed to the host
+	if get_parent_iface (raw_config):
+		return False
+
+	if ifname in ['lo'] or iface_cfg.get ('link-type') == 'dummy':
+		return False
+
+	for prefix in ['br-', 'gre_', 'ovpn-', 'wg-']:
+		if ifname.startswith (prefix):
+			return False
+
+	# If we are still here, there's a good chance this iface is exposed to the VM host
+	return True
+
+
 # Group a list of ports (integers) into ranges
 def _group_ports (port_list):
 	ranges = []
@@ -328,6 +344,9 @@ class Netbox (object):
 
 		# Query and store all services
 		self._store_services (nodes)
+
+		# Associate VMs with their hosts
+		self._associate_vms_to_hosts (nodes)
 
 		return nodes
 
@@ -638,6 +657,10 @@ class Netbox (object):
 
 				iface[our_key] = iface_config[key]
 
+			if node_type == 'vm':
+				# Classify whether we may want to generate config on the VM host for this iface
+				iface['vm_host_cfg'] = gen_vm_host_config_for_iface (ifname, iface, iface_config)
+
 
 	# Query all services from Netbox and store them at the corresponding node
 	def _store_services (self, nodes):
@@ -670,6 +693,41 @@ class Netbox (object):
 				'acl' : srv['custom_fields'].get ('service_acl'),
 				'additional_prefixes' : srv['custom_fields'].get ('service_acl_additional_prefixes'),
 			})
+
+
+	def _associate_vms_to_hosts (self, nodes):
+		for vm, vm_config in nodes.items ():
+			# We only care for VMs
+			if not vm_config.get ('virtual'):
+				continue
+
+			# We should have the VM host present as a device
+			vm_host = nodes.get (vm_config['cluster'])
+			if not vm_host:
+				continue
+
+			if not 'vms' in vm_host:
+				vm_host['vms'] = {}
+
+			vm_ifaces = {}
+			vm_host['vms'][vm] = {
+				'ifaces' : vm_ifaces,
+			}
+
+			for iface, iface_cfg in vm_config['ifaces'].items ():
+				# Ignore interfaces which have this set to False or where it doesn't exist.
+				# The latter could happen if the interface has been defined via config context.
+				if not iface_cfg.get ('vm_host_cfg'):
+					continue
+
+				del iface_cfg['vm_host_cfg']
+
+				vm_iface = {}
+				vm_ifaces[iface] = vm_iface
+
+				for attr in ['mac', 'mtu', 'tagged_vlans', 'vlan-mode']:
+					vm_iface[attr] = iface_cfg.get (attr)
+
 
 	# Tags are now represented as a list containing dicts, one for each tag.
 	# The dict contains the 'name', 'slug', etc.
