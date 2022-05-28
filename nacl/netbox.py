@@ -278,12 +278,9 @@ class Netbox (object):
 		bridges = {}
 
 		for ifname, iface_config in interfaces.items ():
-			br = iface_config.get ('member-of-bridge')
+			br = iface_config.get ('bridge-member')
 			if not br:
 				continue
-
-			# Make sure we don't expose this
-			del iface_config['member-of-bridge']
 
 			if br not in bridges:
 				bridges[br] = []
@@ -496,13 +493,24 @@ class Netbox (object):
 				iface['vrf'] = 'vrf_external'
 
 			# Store interface type, if present, and not virtual
+			if_type = None
 			if 'type' in iface_config:
 				if_type = iface_config['type']['value']
 				if if_type != 'virtual':
 					iface['type'] = if_type
 
-				if if_type == 'bridge':
-					iface['bridge-ports'] = []
+
+			# Is this a bridge?
+			if if_type == 'bridge':
+				iface['bridge-ports'] = []
+
+			# Is this interface member of a bridge?
+			if iface_config.get ('bridge'):
+				iface['bridge-member'] = iface_config['bridge']['name']
+
+			# Store VLAN mode (if set)
+			if iface_config['mode']:
+				iface['vlan-mode'] = iface_config['mode']['value']
 
 			# Dummy interface?
 			if 'dummy' in iface_config['tags']:
@@ -594,10 +602,6 @@ class Netbox (object):
 			# Is this interface part of a LAG?
 			if iface_config.get ('lag'):
 				iface['lag'] = iface_config['lag']['name']
-
-			# Is this interface member of a bridge?
-			if iface_config.get ('bridge'):
-				iface['member-of-bridge'] = iface_config['bridge']['name']
 
 			# Try to figure out if this iface is an 802.1q vlan interface
 			# and - if so - which interface is the vlan-raw-device.
