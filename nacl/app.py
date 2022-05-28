@@ -83,8 +83,8 @@ def _remove_private_keys (node, node_config):
 
 def _generate_ibgp_peers (nodes, node_id):
 	peers = {
-		4: [],
-		6: [],
+		'4': [],
+		'6': [],
 	}
 
 	AFs = []
@@ -95,7 +95,7 @@ def _generate_ibgp_peers (nodes, node_id):
 		return None
 
 	# Check which AFs we support (for what AFs we have a primary/loopback IP)
-	for af in [ 4, 6 ]:
+	for af in [ "4", "6" ]:
 		if af in nodes[node_id]['primary_ips']:
 			AFs.append (af)
 
