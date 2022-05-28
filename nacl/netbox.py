@@ -655,6 +655,10 @@ class Netbox (object):
 					iface[our_key] = self._get_vlan_ids (iface_config[key])
 					continue
 
+				elif key == "untagged_vlan":
+					iface[our_key] = iface_config[key]['vid']
+					continue
+
 				iface[our_key] = iface_config[key]
 
 			if node_type == 'vm':
@@ -725,7 +729,7 @@ class Netbox (object):
 				vm_iface = {}
 				vm_ifaces[iface] = vm_iface
 
-				for attr in ['mac', 'mtu', 'tagged_vlans', 'vlan-mode']:
+				for attr in ['mac', 'mtu', 'tagged_vlans', 'vlan-mode', 'untagged_vlan']:
 					vm_iface[attr] = iface_cfg.get (attr)
 
 
