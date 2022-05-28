@@ -250,7 +250,7 @@ class Netbox (object):
 		for vlan_info in tagged_vlans:
 			vlan_ids.append (vlan_info['vid'])
 
-		return vlan_ids
+		return sorted (vlan_ids)
 
 
 	def _update_bonding_config (self, interfaces):
