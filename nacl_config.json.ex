@@ -35,6 +35,13 @@
 				}
 			}
 		}
-	}
+	},
 
+	"role_map" : {
+		"edge-router": [
+			"router",
+			"l3-access",
+			"dhcp-server"
+		]
+	}
 }

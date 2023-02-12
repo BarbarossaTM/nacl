@@ -215,6 +215,20 @@ def _generate_wireguard_config (nodes, minion_id):
 	return None
 
 
+def _expand_roles(node_config, role_map):
+	node_role = node_config.get('role')
+	if not node_role:
+		return
+
+	roles = node_config.get('roles', [])
+
+	for role in role_map.get(node_role, []):
+		if role not in roles:
+			roles.append(role)
+
+	node_config['roles'] = roles
+
+
 class Nacl (object):
 	def __init__ (self, config_file):
 		self.endpoints = endpoints
@@ -281,6 +295,10 @@ class Nacl (object):
 
 			for key in keys_to_delete:
 				del node_config[key]
+
+		# Map NetBox device role to internal roles
+		for node_config in nodes.values():
+			_expand_roles(node_config, self.config.get("role_map", {}))
 
 		if minion_id in nodes:
 			generated_config = {

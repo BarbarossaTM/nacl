@@ -359,6 +359,7 @@ class Netbox (object):
 			name = device_config['name']
 
 			device = {
+				'role' : device_config['device_role']['slug'],
 				'hardware' : True,
 				'manufacturer' : device_config['device_type']['manufacturer']['name'],
 				'model' : device_config['device_type']['model'],
@@ -392,6 +393,7 @@ class Netbox (object):
 
 			vm = {
 				'virtual' : True,
+				'role' : vm_config['role']['slug'],
 				'cluster' : vm_config['cluster']['name'],
 				'vm_config' : {
 					'vcpus' : vm_config['vcpus'],
