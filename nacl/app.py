@@ -229,6 +229,32 @@ def _expand_roles(node_config, role_map):
 	node_config['roles'] = roles
 
 
+def _get_allowed_down_OSPF_interfaces(nodes, node_name, infra_domain):
+	node_config = nodes[node_name]
+
+	ifaces_down_OK = []
+
+	for ifname in sorted (node_config['ifaces'].keys()):
+		iface_config = node_config['ifaces'][ifname]
+
+		# Interface marked as planned/offline in NetBox?
+		if iface_config.get ('status', '') in [ 'planned', 'offline' ]:
+			ifaces_down_OK.append (ifname)
+			continue
+
+		# Wireguard tunnel?
+		if ifname.startswith ("wg-"):
+			peer = "%s.%s" % (ifname[3:], infra_domain)
+			peer_config = nodes.get(peer)
+			if not peer_config:
+				continue
+
+			if peer_config.get ('status', '') != 'active':
+				ifaces_down_OK.append (ifname)
+
+	return ifaces_down_OK
+
+
 class Nacl (object):
 	def __init__ (self, config_file):
 		self.endpoints = endpoints
@@ -307,6 +333,9 @@ class Nacl (object):
 						'internal' : {
 							'peers' : _generate_ibgp_peers (nodes, minion_id),
 						},
+					},
+					'ospf' : {
+						'ifaces_down_ok' : _get_allowed_down_OSPF_interfaces(nodes, minion_id, self.config.get ('DNS', {}).get ('infra_domain')),
 					},
 				},
 				'wireguard' : _generate_wireguard_config (nodes, minion_id),

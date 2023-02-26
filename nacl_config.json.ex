@@ -43,5 +43,9 @@
 			"l3-access",
 			"dhcp-server"
 		]
-	}
+	},
+
+        "DNS": : {
+                "infra_domain" : "infra.example.com"
+        }
 }
