@@ -432,6 +432,10 @@ class Netbox (object):
 		node['tags'] = tags
 
 		# Process some tags with special meaning
+		if 'ifupdown2' in tags:
+			node['network'] = {
+				'suite' : 'ifupdown2',
+			}
 		if 'ifupdown-ng' in tags:
 			node['network'] = {
 				'suite' : 'ifupdown-ng',
