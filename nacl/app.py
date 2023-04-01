@@ -10,6 +10,7 @@ import os
 import re
 
 from nacl.errors import *
+import nacl.cache
 import nacl.netbox
 
 
@@ -256,12 +257,19 @@ def _get_allowed_down_OSPF_interfaces(nodes, node_name, infra_domain):
 
 
 class Nacl (object):
-	def __init__ (self, config_file):
+	def __init__ (self, config_file, logger, enable_cache):
+		self.log = logger
 		self.endpoints = endpoints
 
 		self._read_config (config_file)
 
 		self.netbox = nacl.netbox.Netbox (self.config['netbox'], self.config.get ('blueprints', {}), self.config.get ('defaults', {}))
+
+		if enable_cache:
+			self.netbox_cache = nacl.cache.NaclCacheObject ("NetBox", logger, self.netbox.get_nodes, 60)
+			self.get_nodes_func = self.netbox_cache.get_data
+		else:
+			self.get_nodes_func = self.netbox.get_nodes
 
 
 	def _read_config (self, config_file):
@@ -292,7 +300,7 @@ class Nacl (object):
 
 
 	def get_pillar_info (self, minion_id):
-		nodes = self.netbox.get_nodes ()
+		nodes = self.get_nodes_func ()
 
 		# Filter out any private keys which are not for <minion_id>
 		for node, node_config in nodes.items ():

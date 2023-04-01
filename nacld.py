@@ -15,6 +15,7 @@ from nacl.app import Nacl
 
 # Parse command line arguments
 parser = argparse.ArgumentParser (description = 'Netbox Automation and Caching Layer for FFHO Salt')
+parser.add_argument ('--cache', '-C', help = 'Enable caching', action = 'store_true', default = True)
 parser.add_argument ('--config', '-c', help = 'Path to config file (json format)')
 parser.add_argument ('--debug', '-D', help = 'Activate werkzeug debugger', action = 'store_true')
 parser.add_argument ('--reload', '-R', help = 'Activate werkzeug reloader', action = 'store_true')
@@ -80,7 +81,7 @@ log = setup_logging (args)
 log.info ("NACL starting...")
 
 # Fire up NACL application
-nacl = Nacl (args.config)
+nacl = Nacl (args.config, log, args.cache)
 
 # Fire up web service
 app = NaclWS (nacl)

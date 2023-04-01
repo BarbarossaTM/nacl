@@ -4,6 +4,8 @@
 		"auth_token": "0815decaf2342netbox4711"
 	}
 
+	"cache": true,
+
 	"blueprints" : {
 		<name>: {
 			"manufacturer" : <slug>,
