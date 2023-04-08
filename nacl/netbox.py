@@ -110,6 +110,10 @@ class Netbox (object):
 		self.blueprints = blueprints
 		self.defaults = defaults
 
+		self.cache = {
+			'sites' : {}
+		}
+
 
 	def _query (self, url, single_value = False):
 		req = requests.get (self.base_url + url, headers = self._headers)
@@ -419,7 +423,7 @@ class Netbox (object):
 			'ssh' : self._get_node_ssh_keys (node_config),
 			'id' : node_config['custom_fields'].get ('id', None),
 			'status' : node_config['status']['label'].lower (),
-			'location' : self._get_location_info (node_config['site']['id'], node_config),
+			'location' : self._get_location_info (node_config['site']['slug'], node_config),
 			'sysLocation' : node_config['site']['name'],	# XXX DEPRECATED XXX
 			#
 			# Maybe in config_context:
@@ -927,8 +931,20 @@ class Netbox (object):
 		return res[0]['id']
 
 
-	def _get_location_info (self, site_id, node_config):
-		site = self._query ("dcim/sites/%s" % site_id, True)
+	def _get_sites (self):
+		res = self._query("dcim/sites/?limit=0")
+		if res is None:
+			return
+
+		sites = {}
+		for entry in res:
+			sites[entry['slug']] = entry
+
+		self.cache['sites'] = sites
+
+
+	def _get_location_info (self, site_slug, node_config):
+		site = self.cache['sites'].get (site_slug)
 		if not site:
 			return None
 
