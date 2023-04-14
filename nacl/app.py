@@ -21,6 +21,11 @@ endpoints = {
 		'args' : ['request/remote_addr', 'POST/key_type', 'POST/key', 'POST/mac?'],
 	},
 
+	'/node/whoami' : {
+		'call' : 'whoami',
+		'args' : ['request/remote_addr', 'GET/mac?'],
+	},
+
 
 	# API endpoints called by Salt
 	'/salt/get_pillar_info' : {
@@ -303,6 +308,21 @@ class Nacl (object):
 			raise NaclError (f"Key of type '{key_type}' already present for node '{node['name']}'!")
 
 		return self.netbox.set_node_ssh_key (node, key_type, key)
+
+	# Return the FQDN of the node identified by the remote IP or given MAC address, if we know it
+	def whoami (self, remote_addr, mac = None):
+		node = None
+
+		if mac is not None:
+			node = self.netbox.get_node_by_mac (mac)
+		else:
+			node = self.netbox.get_node_by_ip (remote_addr)
+
+		if node is None:
+			raise NaclError (f"No node found for IP {remote_addr} / MAC {mac}!")
+
+		return node['name']
+
 
 	def get_pillar_info (self, minion_id):
 		nodes = self.get_nodes_func ()
