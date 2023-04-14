@@ -114,6 +114,8 @@ class Netbox (object):
 			'sites' : {}
 		}
 
+		self._get_sites ()
+
 
 	def _query (self, url, single_value = False, **kwargs):
 		req = requests.get (self.base_url + url, headers = self._headers, **kwargs)
