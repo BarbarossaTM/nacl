@@ -18,7 +18,7 @@ endpoints = {
 	# API endpoints called by nodes
 	'/node/register_ssh_key' : {
 		'call' : 'register_ssh_key',
-		'args' : ['request/remote_addr', 'POST/key_type', 'POST/key'],
+		'args' : ['request/remote_addr', 'POST/key_type', 'POST/key', 'POST/mac?'],
 	},
 
 
@@ -288,16 +288,21 @@ class Nacl (object):
 	#
 
 	# Register given ssh key of given type for device with given IP if none is already present
-	def register_ssh_key (self, remote_addr, key_type, key):
-		node = self.netbox.get_node_by_ip (remote_addr)
+	def register_ssh_key (self, remote_addr, key_type, key, mac = None):
+		node = None
+
+		if mac is not None:
+			node = self.netbox.get_node_by_mac (mac)
+		else:
+			node = self.netbox.get_node_by_ip (remote_addr)
+
 		if not node:
-			raise NaclError ("No node found for IP '%s'." % remote_addr)
+			raise NaclError (f"No node found for IP {remote_addr} / MAC {mac}!")
 
-		if self.netbox.get_node_ssh_key (node[0], node[1], key_type):
-			raise NaclError ("Key of type '%s' already present for node '%s'!" % (key_type, remote_addr))
+		if self.netbox.get_node_ssh_key (node, key_type):
+			raise NaclError (f"Key of type '{key_type}' already present for node '{node['name']}'!")
 
-		return self.netbox.set_node_ssh_key (node[0], node[1], key_type, key)
-
+		return self.netbox.set_node_ssh_key (node, key_type, key)
 
 	def get_pillar_info (self, minion_id):
 		nodes = self.get_nodes_func ()

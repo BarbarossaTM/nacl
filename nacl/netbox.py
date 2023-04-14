@@ -115,8 +115,8 @@ class Netbox (object):
 		}
 
 
-	def _query (self, url, single_value = False):
-		req = requests.get (self.base_url + url, headers = self._headers)
+	def _query (self, url, single_value = False, **kwargs):
+		req = requests.get (self.base_url + url, headers = self._headers, **kwargs)
 		if req.status_code != 200:
 			return None
 
@@ -152,29 +152,6 @@ class Netbox (object):
 		return res.json ()
 
 
-	def get_node_by_ip (self, ip):
-		try:
-			res = self._query ("ipam/ip-addresses/?address=%s" % ip)
-			if not res:
-				return None
-
-			iface = res[0]['assigned_object']
-
-			# For VMs 'virtual_machine' is a dict, otherwise it's set but None
-			vm = iface.get ('virtual_machine', None)
-			if vm:
-				return ['virtual_machine', vm['id']]
-
-			# For devices 'device' is a dict, otherwise it's set but None
-			device = iface.get ('device', None)
-			if device:
-				return ['device', device['id']]
-		except IndexError:
-			return None
-		except KeyError:
-			return None
-
-
 	def _is_valid_ssh_key_type (self, key_type):
 		return key_type in valid_ssh_key_types
 
@@ -187,25 +164,14 @@ class Netbox (object):
 			raise NetboxError ("Invalid device_type '%s'" % device_id)
 
 
-	def _get_node_info (self, device_type, device_id):
-		self._validate_device_type (device_type)
-
-		node_info = self._query ("%s/%s" % (path_map[device_type], device_id), True)
-
-		if not 'id' in node_info:
-			raise NetboxError ("Node of type '%s' and ID '%s' not found." % (device_type, device_id))
-
-		return node_info
-
 	#
 	# Config context / SSH
 	#
-	def get_node_ssh_key (self, device_type, device_id, key_type):
+	def get_node_ssh_key (self, node, key_type):
 		self._validate_ssh_key_type (key_type)
 
 		try:
-			node_info = self._get_node_info (device_type, device_id)
-			key = node_info['config_context']['ssh'][key_type]
+			key = node['config_context']['ssh'][key_type]
 
 			# Just return the public key (without trailing space)
 			if key_type.endswith ("_pub"):
@@ -233,32 +199,32 @@ class Netbox (object):
 
 
 	# Return all know key types (if present)
-	def get_node_ssh_keys (self, device_type, device_id):
+	def get_node_ssh_keys (self, node):
 		keys = {}
 
 		for key_type in valid_ssh_key_types:
-			keys[key_type] = self.get_node_ssh_key (device_type, device_id, key_type)
+			keys[key_type] = self.get_node_ssh_key (node, key_type)
 
 		return keys
 
 
-	def set_node_ssh_key (self, device_type, device_id, key_type, key):
+	def set_node_ssh_key (self, node, key_type, key):
 		self._validate_ssh_key_type (key_type)
 
-		node_info = self._get_node_info (device_type, device_id)
-
 		data = {
-			'name' : node_info['name'],
-			'local_context_data' : node_info['config_context'],
+			'name' : node['name'],
+			'local_context_data' : node['config_context'],
 		}
 
 		data['local_context_data']['ssh'][key_type] = key.replace ("\n", " ")
 
 		# A VMs has to have the cluster set..
-		if device_type == "virtual_machine":
-			data['cluster'] = node_info['cluster']['id']
+		node_type = "device"
+		if not 'device_type' in node:
+			node_type = "virtual_machine"
+			data['cluster'] = node['cluster']['id']
 
-		res = self._patch ("%s/%s/" % (path_map[device_type], device_id), data)
+		res = self._patch ("%s/%s/" % (path_map[node_type], node['id']), data)
 
 
 	#
@@ -328,6 +294,77 @@ class Netbox (object):
 			ips['v6'] = node_config['primary_ip6']['address']
 
 		return ips
+
+
+	def get_node_by_ip (self, ip):
+		params = {
+			'address' : ip,
+		}
+
+		try:
+			res = self._query ("ipam/ip-addresses/", params = params)
+			if not res:
+				return None
+
+			if len (res) != 1:
+				raise NetboxError (f"Got {len (res)} interfaces with IP {ip}!")
+
+			iface = res[0]['assigned_object']
+
+			# For VMs 'virtual_machine' is a dict, otherwise it's present but None
+			vm = iface.get ('virtual_machine', None)
+			if vm:
+				return self.get_node ('virtual_machine', vm['id'])
+
+			# For devices 'device' is a dict, otherwise it's present but None
+			device = iface.get ('device', None)
+			if device:
+				return self.get_node ('device', device['id'])
+		except IndexError:
+			return None
+		except KeyError:
+			return None
+
+
+	def get_node_by_mac (self, mac):
+		params = {
+			'mac_address' : mac,
+		}
+
+		try:
+			res = self._query ("dcim/interfaces/", params = params)
+			if not res:
+				return None
+
+			if len (res) != 1:
+				raise NetboxError (f"Got {len (res)} interfaces with MAC {mac}!")
+
+			iface = res[0]
+
+			# For VMs 'virtual_machine' is a dict, otherwise it's present but None
+			vm = iface.get ('virtual_machine', None)
+			if vm:
+				return self.get_node ('virtual_machine', vm['id'])
+
+			# For devices 'device' is a dict, otherwise it's present but None
+			device = iface.get ('device', None)
+			if device:
+				return self.get_node ('device', device['id'])
+		except IndexError:
+			return None
+		except KeyError:
+			return None
+
+
+	def get_node (self, node_type, node_id):
+		self._validate_device_type (node_type)
+
+		node_info = self._query ("%s/%s" % (path_map[node_type], node_id), True)
+
+		if not 'id' in node_info:
+			raise NetboxError ("Node of type '%s' and ID '%s' not found." % (node_type, node_id))
+
+		return node_info
 
 
 	# Return a dict of all nodes (read: devices + VMs)
