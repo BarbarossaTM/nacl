@@ -9,6 +9,7 @@ import json
 import os
 import re
 
+from nacl.common import *
 from nacl.errors import *
 import nacl.cache
 import nacl.netbox
@@ -307,7 +308,8 @@ class Nacl (object):
 		if self.netbox.get_node_ssh_key (node, key_type):
 			raise NaclError (f"Key of type '{key_type}' already present for node '{node['name']}'!")
 
-		return self.netbox.set_node_ssh_key (node, key_type, key)
+		return NaclResponse (self.netbox.set_node_ssh_key (node, key_type, key))
+
 
 	# Return the FQDN of the node identified by the remote IP or given MAC address, if we know it
 	def whoami (self, remote_addr, mac = None):
@@ -321,7 +323,7 @@ class Nacl (object):
 		if node is None:
 			raise NaclError (f"No node found for IP {remote_addr} / MAC {mac}!")
 
-		return node['name']
+		return NaclResponse (node['name'])
 
 
 	def get_pillar_info (self, minion_id):
@@ -376,19 +378,19 @@ class Nacl (object):
 
 			nodes[minion_id].update (generated_config)
 
-		return nodes
+		return NaclResponse (nodes)
 
 
 	def add_surge_protector (self, name, site):
-		return self.netbox.add_surge_protector (name, site)
+		return NaclResponse (self.netbox.add_surge_protector (name, site))
 
 
 	def add_patchpanel (self, name, site, ports):
-		return self.netbox.add_patchpanel (name, site, ports)
+		return NaclResponse (self.netbox.add_patchpanel (name, site, ports))
 
 
 	def connect_panel_to_surge (self, panel_name, panel_port, surge_name):
-		return self.netbox.connect_panel_to_surge (panel_name, panel_port, surge_name)
+		return NaclResponse (self.netbox.connect_panel_to_surge (panel_name, panel_port, surge_name))
 
 	def add_ip (self, status, address, dns_name = None, interface = None, device = None, vm = None):
 		if_id = None
@@ -397,4 +399,4 @@ class Nacl (object):
 			if not if_id:
 				raise NaclError ("Did not find interface, not adding IP address!")
 
-		return self.netbox.add_ip (status, address, dns_name, if_id)
+		return NaclResponse (self.netbox.add_ip (status, address, dns_name, if_id))
