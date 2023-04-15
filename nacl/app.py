@@ -305,10 +305,15 @@ class Nacl (object):
 		if not node:
 			raise NaclError (f"No node found for IP {remote_addr} / MAC {mac}!")
 
-		if self.netbox.get_node_ssh_key (node, key_type):
+		ext_key = self.netbox.get_node_ssh_key (node, key_type)
+		if ext_key:
+			if key.strip() == ext_key:
+				return NaclResponse ("Key already set", code = 200)
+
 			raise NaclError (f"Key of type '{key_type}' already present for node '{node['name']}'!")
 
-		return NaclResponse (self.netbox.set_node_ssh_key (node, key_type, key))
+		self.netbox.set_node_ssh_key (node, key_type, key)
+		return NaclResponse ("Key registered", code = 201)
 
 
 	# Return the FQDN of the node identified by the remote IP or given MAC address, if we know it

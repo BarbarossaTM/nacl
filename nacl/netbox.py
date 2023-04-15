@@ -176,7 +176,7 @@ class Netbox (object):
 			key = node['config_context']['ssh'][key_type]
 
 			# Just return the public key (without trailing space)
-			if key_type.endswith ("_pub"):
+			if key_type.endswith (".pub"):
 				return key.strip ()
 
 			return self._unfuck_crypto_key (key)
