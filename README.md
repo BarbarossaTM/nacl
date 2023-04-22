@@ -19,5 +19,14 @@ By default NetBox data will be refreshed every 1 minute after the last refresh e
 
 ## Requirements
 
+### Python environment
+
+NACL requires the `requests` and `werkzeug` Python libraries.
+On a Debian system you can install them via:
+
     apt-get install python3-requests python3-werkzeug
 
+### NetBox
+
+NACL is using the NetBox API as exposed by version 3.4.7.
+As NetBox does minor and even major breaking changes from time to time, NACL will not be compatible with much older or potentially newer versions.
