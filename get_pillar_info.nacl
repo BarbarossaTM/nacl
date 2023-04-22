@@ -12,7 +12,7 @@ from nacl.app import Nacl
 parser = argparse.ArgumentParser ()
 parser.add_argument ('--config', '-c', help = "Path to 'nacl_config.json'")
 parser.add_argument ('--all', '-a', action = 'store_true', help = 'Print all nodes')
-parser.add_argument ('node', help = 'Node id to query fully')
+parser.add_argument ('node', help = 'Node id to query for (output will include private info for this one)')
 args = parser.parse_args ()
 
 #
@@ -31,13 +31,19 @@ if not getattr (args, 'config'):
 
 nacl = Nacl (args.config, logging.getLogger ('nacl'), False)
 
-nodes = nacl.get_pillar_info (args.node)
+resp = nacl.get_pillar_info (args.node)
+
+if resp.code != 200:
+	print (f"Error while getting pillar info, got HTTP code {resp.code}!")
+	sys.exit (1)
+
+nodes = resp.value
 
 if args.all:
 	print (json.dumps (nodes, indent = 4, sort_keys = True))
 else:
 	node = nodes.get (args.node, None)
 	if not node:
-		print ("Node '%s' not found" % args.node)
+		print (f"Node '{args.node}' not found!")
 
 	print (json.dumps (node, indent = 4, sort_keys = True))
