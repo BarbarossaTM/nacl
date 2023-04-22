@@ -946,29 +946,6 @@ class Netbox (object):
 		iface_config['gateway'] = gateways
 
 
-	def _get_device_role_id_by_slug (self, slug):
-		res = self._query ('dcim/device-roles/?slug=%s' % slug)
-		if not res:
-			return None
-
-		return res[0]['id']
-
-
-	def _get_device_type_id (self, manufacterer, slug):
-		res = self._query ('dcim/device-types/?manufacterer=%s&slug=%s' % (manufacterer, slug))
-		if not res:
-			return None
-
-		return res[0]['id']
-
-	def _get_site_id (self, name):
-		res = self._query ('dcim/sites/?name=%s' % name)
-		if not res:
-			return None
-
-		return res[0]['id']
-
-
 	def _get_sites (self):
 		res = self._query("dcim/sites/?limit=0")
 		if res is None:
