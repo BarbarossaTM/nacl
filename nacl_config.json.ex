@@ -6,26 +6,6 @@
 
 	"cache": true,
 
-	"blueprints" : {
-		<name>: {
-			"manufacturer" : <slug>,
-			"device_type" : <slug>,
-			"device_role" : <slug>
-		},
-
-		"patchpanel" : {
-			"manufacturer" : "telegrtner",
-			"device_type" : "patchpanel",
-			"device_role" : "patchpanel"
-		},
-
-		"surge" : {
-			"manufacturer" : "ubnt",
-			"device_type" : "surge-protector",
-			"device_role" : "surge-protector"
-		}
-	},
-
 	"defaults" : {
 		"interfaces" : {
 			"by_name" : {
