@@ -2,21 +2,22 @@
 
 NACL is the Netbox Abstration / Automation & Caching Layer for [Freifunk Hochstift Salt Stack](https://github.com/FreifunkHochstift/ffho-salt-public).
 
-The aim is to manage all nodes of the Freifunk Hochstift network within [NetBox](https://github.com/digitalocean/netbox).
-This includes physical devices as well as virtual machines (including their ressources and placement on VM hosts).
-Physical devices could be general Linux boxes which run a Salt minion, switches (which might be managed by NAPALM in the future) or wireless backbone devices.
+We're managing all our Linux nodes inside the Freifunk Hochstift network within [NetBox](https://github.com/netbox-community/netbox).
+This includes physical devices as well as virtual machines including host-side VM interface configuration.
 
-Those devices will be documentated including
+In the future this shall be extended to regular networking kit (mainly switches) and wireless equipment (e.g. for wireless backbone links).
+
+Those devices are documentated including
  * their OS (platform)
- * network interfaces and connections
+ * network interfaces and connections including Wireguard tunnels
  * IP addresses and their VRFs
  * SSH keys and SSL host cert/keys (stored in config contexts)
  * roles of the device
 
-The aim is to remove all those information from Salt pillar and use NetBox + NACL as the only source of truth for all devices.
+NACL has a caching layer to speed up requests from Salt and will cache the last successfully fetch data set in memory until the next refresh was successful. 
+By default NetBox data will be refreshed every 1 minute after the last refresh ended.
 
 ## Requirements
 
     apt-get install python3-requests python3-werkzeug
-
 
