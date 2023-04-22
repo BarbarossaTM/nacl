@@ -33,28 +33,6 @@ endpoints = {
 		'call' : 'get_pillar_info',
 		'args' : ['GET/minion_id'],
 	},
-
-
-	# API endpoints called by CLI tools / ops
-	'/ops/devices/add_surge_protector' : {
-		'call' : 'add_surge_protector',
-		'args' : ['POST/name', 'POST/site'],
-	},
-
-	'/ops/devices/add_patchpanel' : {
-		'call' : 'add_patchpanel',
-		'args' : ['POST/name', 'POST/site', 'POST/ports'],
-	},
-
-	'/ops/cables/connect_panel_to_surge' : {
-		'call' : 'connect_panel_to_surge',
-		'args' : [ 'POST/panel_name', 'POST/panel_port', 'POST/surge_name'],
-	},
-
-	'/ops/ip/add' : {
-		'call' : 'add_ip',
-		'args' : [ 'POST/status', 'POST/address', 'POST/dns_name?', 'POST/interface?', 'POST/device?', 'POST/vm?' ],
-	}
 }
 
 
@@ -269,7 +247,7 @@ class Nacl (object):
 
 		self._read_config (config_file)
 
-		self.netbox = nacl.netbox.Netbox (self.config['netbox'], self.config.get ('blueprints', {}), self.config.get ('defaults', {}))
+		self.netbox = nacl.netbox.Netbox (self.config['netbox'], self.config.get ('defaults', {}))
 
 		if enable_cache:
 			self.netbox_cache = nacl.cache.NaclCacheObject ("NetBox", logger, self.netbox.get_nodes, 60)
@@ -384,24 +362,3 @@ class Nacl (object):
 			nodes[minion_id].update (generated_config)
 
 		return NaclResponse (nodes)
-
-
-	def add_surge_protector (self, name, site):
-		return NaclResponse (self.netbox.add_surge_protector (name, site))
-
-
-	def add_patchpanel (self, name, site, ports):
-		return NaclResponse (self.netbox.add_patchpanel (name, site, ports))
-
-
-	def connect_panel_to_surge (self, panel_name, panel_port, surge_name):
-		return NaclResponse (self.netbox.connect_panel_to_surge (panel_name, panel_port, surge_name))
-
-	def add_ip (self, status, address, dns_name = None, interface = None, device = None, vm = None):
-		if_id = None
-		if interface:
-			if_id = self.netbox.get_interface (interface, device_name = device, vm_name = vm)
-			if not if_id:
-				raise NaclError ("Did not find interface, not adding IP address!")
-
-		return NaclResponse (self.netbox.add_ip (status, address, dns_name, if_id))
