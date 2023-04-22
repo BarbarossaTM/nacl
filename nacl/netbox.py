@@ -767,7 +767,7 @@ class Netbox (object):
 				'ifaces' : vm_ifaces,
 			}
 
-			for iface, iface_cfg in vm_config['ifaces'].items ():
+			for iface, iface_cfg in vm_config.get('ifaces', {}).items ():
 				# Ignore interfaces which have this set to False or where it doesn't exist.
 				# The latter could happen if the interface has been defined via config context.
 				vm_host_cfg = iface_cfg.get ('vm_host_cfg')
