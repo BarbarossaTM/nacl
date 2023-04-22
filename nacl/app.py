@@ -201,17 +201,15 @@ def _generate_wireguard_config (nodes, minion_id):
 
 
 def _expand_roles(node_config, role_map):
-	node_role = node_config.get('role')
-	if not node_role:
-		return
-
 	roles = node_config.get('roles', [])
 
-	for role in role_map.get(node_role, []):
-		if role not in roles:
-			roles.append(role)
+	node_role = node_config.get('role')
+	if node_role:
+		for role in role_map.get(node_role, []):
+			if role not in roles:
+				roles.append(role)
 
-	node_config['roles'] = roles
+	node_config['roles'] = sorted(roles)
 
 
 def _get_allowed_down_OSPF_interfaces(nodes, node_name, infra_domain):
