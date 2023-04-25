@@ -555,6 +555,10 @@ class Netbox (object):
 
 			iface['has_gateway'] = 'gateway_iface' in iface_config['tags']
 
+			# VRF set on interface?
+			if iface_config['vrf']:
+				iface['vrf'] = iface_config['vrf']['name']
+
 			# Set VRF for interface without IPs
 			if 'vrf_external' in iface_config['tags']:
 				iface['vrf'] = 'vrf_external'
