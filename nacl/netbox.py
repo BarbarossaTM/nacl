@@ -4,6 +4,7 @@
 #  --  Sun 22 Apr 2018 11:10:55 AM CEST
 #
 
+import copy
 import ipaddress
 import json
 import re
@@ -334,6 +335,9 @@ class Netbox (object):
 
 		try:
 			res = self._query ("dcim/interfaces/", params = params)
+			if not res:
+				res = self._query ("virtualization/interfaces/", params = params)
+
 			if not res:
 				return None
 
@@ -830,24 +834,20 @@ class Netbox (object):
 		certs = {}
 
 		try:
-			for cn, cert in node_config['config_context']['ssl'].items ():
+			for cn, cert_cfg in node_config['config_context']['ssl'].items ():
 				key = cn
 				if cn == 'host':
 					key = node_name
 
+				cert_cfg = copy.deepcopy (cert_cfg)
+
 				try:
-					certs[key] = {
-						'cert': self._unfuck_crypto_key (node_config['config_context']['ssl'][cn]['cert']),
-						'privkey': self._unfuck_crypto_key (node_config['config_context']['ssl'][cn]['key']),
-					}
+					cert_cfg['cert'] = self._unfuck_crypto_key (node_config['config_context']['ssl'][cn]['cert'])
+					cert_cfg['privkey'] = self._unfuck_crypto_key (node_config['config_context']['ssl'][cn]['key'])
+
+					certs[key] = cert_cfg
 				except KeyError:
 					pass
-
-				# FIXME: This will probably go somewhere else and may be better up in Salt pillar?
-				if 'install' in node_config['config_context']['ssl'][cn]:
-					certs[key] = {
-						"install" : node_config['config_context']['ssl'][cn]["install"]
-					}
 		except Exception as e:
 			raise NetboxError ("Failed to gather SSL certs for node '%s': %s" % (node_name, e))
 
