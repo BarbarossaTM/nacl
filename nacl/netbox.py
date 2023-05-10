@@ -598,10 +598,6 @@ class Netbox (object):
 
 				node_config['pppoe']['iface'] = ifname
 
-				# Ignore this interface for further processing and thereby do NOT
-				# generate an interface stanza in /etc/network/interfaces
-				continue
-
 			# ppp interfaces are started by other means for now - FIXME
 			if ifname == 'ppp0':
 				iface['auto'] = False
