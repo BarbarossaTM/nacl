@@ -114,7 +114,7 @@ def _generate_ibgp_peers (nodes, node_id):
 
 			peer_config = {
 				# mangle . and - to _ to make bird happy
-				'node' : re.sub ('[.-]', '_', node),
+				'node' : node,
 				'ip' : peer_node_config['primary_ips'][af].split ('/')[0],
 				'rr_client' : False,
 			}
