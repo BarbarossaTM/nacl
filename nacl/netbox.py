@@ -826,24 +826,27 @@ class Netbox (object):
 
 	# Get the nodes SSL certificate
 	def _get_node_ssl_certs (self, node_config):
-		node_name = node_config.get ('name', node_config.get ('name'))
 		certs = {}
 
 		try:
+			node_name = node_config['name']
+
 			for cn, cert_cfg in node_config['config_context']['ssl'].items ():
 				key = cn
 				if cn == 'host':
 					key = node_name
 
 				cert_cfg = copy.deepcopy (cert_cfg)
+				if 'key' in cert_cfg:
+					del cert_cfg['key']
 
 				try:
 					cert_cfg['cert'] = self._unfuck_crypto_key (node_config['config_context']['ssl'][cn]['cert'])
 					cert_cfg['privkey'] = self._unfuck_crypto_key (node_config['config_context']['ssl'][cn]['key'])
-
-					certs[key] = cert_cfg
 				except KeyError:
 					pass
+
+				certs[key] = cert_cfg
 		except Exception as e:
 			raise NetboxError ("Failed to gather SSL certs for node '%s': %s" % (node_name, e))
 
