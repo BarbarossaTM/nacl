@@ -474,6 +474,10 @@ class Netbox (object):
 
 		tags = self._get_tag_slugs (node_config['tags'])
 
+		# Temporary status override?
+		if 'offline' in tags:
+			node['status'] = 'offline'
+
 		# Store tags for evaluation within Salt
 		node['tags'] = tags
 
