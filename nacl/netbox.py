@@ -82,6 +82,12 @@ def gen_vm_host_config_for_iface (ifname, iface_cfg, raw_config):
 	# If we are still here, there's a good chance this iface is exposed to the VM host
 	return True
 
+def get_platform(node_config):
+	if node_config['platform'] is None:
+		return None
+
+	return node_config['platform']['slug']
+
 
 # Group a list of ports (integers) into ranges
 def _group_ports (port_list):
@@ -397,11 +403,24 @@ class Netbox (object):
 		return nodes
 
 
+	def _device_eligible(self, node_config):
+		if node_config['device_role']['slug'] == 'core-switch':
+			return True
+
+		if get_platform(node_config) == 'linux':
+			return True
+
+		return False
+
+
 	# Return a dict of all devices with interfaces
 	def get_devices (self):
 		devices = {}
 
-		for device_config in self._query ("dcim/devices/?limit=0&platform=linux"):
+		for device_config in self._query ("dcim/devices/?limit=0"):
+			if not self._device_eligible(device_config):
+				continue
+
 			name = device_config['name']
 
 			device = {
@@ -461,8 +480,6 @@ class Netbox (object):
 	def _get_common_attributes (self, node_config):
 		node = {
 			'primary_ips' : self._get_primary_ips (node_config),
-			'certs' : self._get_node_ssl_certs (node_config),
-			'ssh' : self._get_node_ssh_keys (node_config),
 			'id' : node_config['custom_fields'].get ('id', None),
 			'status' : node_config['status']['label'].lower (),
 			'location' : self._get_location_info (node_config['site']['slug'], node_config),
@@ -471,6 +488,10 @@ class Netbox (object):
 			# Maybe in config_context:
 			# roles, sites, ifaces, monitoring, mailname, ...
 		}
+
+		if get_platform(node_config) == "linux":
+			node['certs'] = self._get_node_ssl_certs (node_config)
+			node['ssh'] = self._get_node_ssh_keys (node_config)
 
 		tags = self._get_tag_slugs (node_config['tags'])
 
