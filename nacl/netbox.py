@@ -489,7 +489,8 @@ class Netbox (object):
 			# roles, sites, ifaces, monitoring, mailname, ...
 		}
 
-		if get_platform(node_config) == "linux":
+		node['platform'] = get_platform(node_config)
+		if node['platform'] == "linux":
 			node['certs'] = self._get_node_ssl_certs (node_config)
 			node['ssh'] = self._get_node_ssh_keys (node_config)
 
