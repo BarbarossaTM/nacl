@@ -94,9 +94,10 @@ def _generate_ibgp_peers (nodes, node_id):
 
 		peer_node_config = nodes[node]
 
-		# If this node isn't a router it won't be a peer
+		# If the remote node isn't a router nor a core-switch, it won't be a peer
 		peer_roles = peer_node_config.get ('roles', [])
-		if not 'router' in peer_roles:
+		peer_role = peer_node_config.get ('role', "")
+		if not 'router' in peer_roles and 'core-switch' != peer_role:
 			continue
 
 		# Carry on if neither we nor the peer are a RR
