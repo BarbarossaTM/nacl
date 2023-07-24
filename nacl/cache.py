@@ -13,6 +13,13 @@ from nacl.errors import *
 
 class NaclCacheObject(object):
 	def __init__(self, name, logger, data_func, update_interval):
+		"""
+		Set up a new Cache with the given <name>.
+
+		logger is the logging instance to use,
+		data_func() a function returning data to be cached,
+		update_interval is the time passed to time.sleep() between gathering a new ste of data
+		"""
 		self.lock = Lock()
 
 		self.name = name
@@ -30,6 +37,9 @@ class NaclCacheObject(object):
 		self._update_thread.start()
 
 	def get_data (self):
+		"""
+		Return a (deep) copy of the topology data gathered from NetBox
+		"""
 		self.lock.acquire()
 		data = copy.deepcopy(self.data)
 		self.lock.release()
@@ -37,6 +47,9 @@ class NaclCacheObject(object):
 		return data
 
 	def stop(self):
+		"""
+		Stop the cache update thread.
+		"""
 		self._stopped = True
 		self._update_thread.stop()
 
