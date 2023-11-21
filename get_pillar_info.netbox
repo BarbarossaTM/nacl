@@ -23,7 +23,7 @@ except IOError as i:
 	print ("Failed to read config from '%s': %s" % (args.config, str (i)))
 	sys.exit (1)
 
-netbox = nacl.netbox.Netbox (config['netbox'], {}, {})
+netbox = nacl.netbox.Netbox (config['netbox'], {})
 
 nodes = netbox.get_nodes ()
 
