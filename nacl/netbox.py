@@ -133,7 +133,19 @@ class Netbox (object):
 		if single_value:
 			return res
 
-		return res['results']
+		data = res['results']
+
+		# Check if we reached the server's response limit, if so we need to do
+		# additional query/ies to fetch all data.
+		while res['next'] is not None:
+			req = requests.get (res['next'], headers = self._headers, **kwargs)
+			if req.status_code != 200:
+				return None
+
+			res = req.json ()
+			data.extend(res['results'])
+
+		return data
 
 
 	def _post (self, url, data):
