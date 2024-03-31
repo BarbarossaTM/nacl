@@ -6,12 +6,11 @@
 
 from werkzeug.exceptions import InternalServerError
 
-class NaclError (Exception): {}
+class NaclError (Exception): pass
 
-class NetboxError (NaclError): {}
+class CacheError (NaclError): pass
+class ConfigError(NaclError): pass
+class ModuleError(NaclError): pass
+class NetboxError (NaclError): pass
 
-class BlueprintError (NaclError): {}
-
-class CacheError (NaclError): {}
-
-class DeveloperError (InternalServerError): {}
+class DeveloperError (InternalServerError): pass

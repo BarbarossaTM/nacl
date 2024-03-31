@@ -6,20 +6,20 @@
 
 	"cache": true,
 
-	"defaults" : {
-		"interfaces" : {
-			"by_name" : {
-				"anycast_srv" : {
+	"defaults": {
+		"interfaces": {
+			"by_name": {
+				"anycast_srv": {
 					"link-type": "dummy"
 				},
-				"srv" : {
+				"srv": {
 					"link-type": "dummy"
 				}
 			}
 		}
 	},
 
-	"role_map" : {
+	"role_map": {
 		"edge-router": [
 			"router",
 			"l3-access",
@@ -27,7 +27,10 @@
 		]
 	},
 
-        "DNS": : {
-                "infra_domain" : "infra.example.com"
-        }
+	"DNS": {
+		"infra_domain": "infra.example.com"
+	},
+
+	"modules": [
+	]
 }
