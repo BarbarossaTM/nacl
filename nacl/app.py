@@ -10,8 +10,9 @@ import os
 import re
 
 from nacl.common import *
-from nacl.errors import *
+from nacl.errors import NaclError
 import nacl.cache
+import nacl.modules
 import nacl.netbox
 
 
@@ -239,12 +240,22 @@ def _get_allowed_down_OSPF_interfaces(nodes, node_name, infra_domain):
 	return ifaces_down_OK
 
 
+def _read_config (config_file):
+	try:
+		with open (config_file, 'r') as config_fh:
+			return json.load (config_fh)
+	except IOError as i:
+		raise NaclError ("Failed to read config from '%s': %s" % (config_file, str (i)))
+
+
 class Nacl (object):
 	def __init__ (self, config_file, logger, enable_cache):
 		self.log = logger
 		self.endpoints = endpoints
 
-		self._read_config (config_file)
+		self.config = _read_config(config_file)
+
+		self.module_manager = nacl.modules.ModuleManager(self.config, logger)
 
 		self.netbox = nacl.netbox.Netbox (self.config['netbox'], self.config.get ('defaults', {}))
 
@@ -253,14 +264,6 @@ class Nacl (object):
 			self.get_nodes_func = self.netbox_cache.get_data
 		else:
 			self.get_nodes_func = self.netbox.get_nodes
-
-
-	def _read_config (self, config_file):
-		try:
-			with open (config_file, 'r') as config_fh:
-				self.config = json.load (config_fh)
-		except IOError as i:
-			raise NaclError ("Failed to read config from '%s': %s" % (config_file, str (i)))
 
 
 	def get_endpoints (self):
@@ -342,6 +345,8 @@ class Nacl (object):
 		# Map NetBox device role to internal roles
 		for node_config in nodes.values():
 			_expand_roles(node_config, self.config.get("role_map", {}))
+
+		self.module_manager.run_modules(nodes, minion_id)
 
 		if minion_id in nodes:
 			generated_config = {
