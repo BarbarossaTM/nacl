@@ -129,79 +129,6 @@ def _generate_ibgp_peers (nodes, node_id):
 	return peers
 
 
-def _generate_wireguard_config (nodes, minion_id):
-	tunnels = {}
-
-	node = nodes[minion_id]
-
-	# Wireguard private key set for this node? If not, there's nothing to be done here
-	try:
-		node_privkey = node['wireguard']['privkey']
-	except KeyError:
-		return None
-
-	for iface, iface_cfg in node['ifaces'].items ():
-		# Get Wireguard public from peer, if present
-		try:
-			peer_fqdn = iface_cfg['wireguard']['peer']
-			peer_node = nodes[peer_fqdn]
-			peer_pubkey = peer_node['wireguard']['pubkey']
-		except KeyError:
-			continue
-
-		# Get public IP of peer
-		peer_ip = None
-		for peer_iface, peer_iface_cfg in peer_node['ifaces'].items ():
-			if not peer_iface_cfg.get ('vrf') == 'vrf_external':
-				continue
-
-			for ip_cidr in peer_iface_cfg['prefixes']:
-				ip = ipaddress.ip_address (ip_cidr.split ('/')[0])
-				if ip.version == 4:
-					peer_ip = str (ip)
-
-		# Calculate Wireguard port based on the IPv6 subnet assigned to the tunnel.
-		# We use 2a03:2260:2342:fd00::/56 for all VPN PTP links and just use the 8 bits
-		# from /56 to /64 as index and 52000 as base.
-		port = None
-		for ip_cidr in iface_cfg['prefixes']:
-			ip = ipaddress.ip_address (ip_cidr.split ('/')[0])
-			if ip.version == 6:
-				port = 50000 + int (str (ip).split (':')[3].replace ('fd',''), 16)
-
-		if not port:
-			continue
-
-		# By default we assume we are a client and should connect to the peer
-		mode = 'client'
-
-		# If we are a core router and the peer is not, we are serer
-		if minion_id.startswith ('cr') and not peer_fqdn.startswith ('cr'):
-			mode = 'server'
-
-		# If we are a core router and the peer is too, the one with the lower ID is server
-		local_match = re.search ('^cr(\d+).*$', minion_id)
-		peer_match = re.search ('^cr(\d+).*$', peer_fqdn)
-		if local_match and peer_match and int (local_match.group (1)) < int (peer_match.group (1)):
-			mode = 'server'
-
-		tunnels[iface] = {
-			'peer_fqdn' : peer_fqdn,
-			'peer_pubkey' : peer_pubkey,
-			'peer_ip' : peer_ip,
-			'port' : port,
-			'mode' : mode,
-		}
-
-	if tunnels:
-		return {
-			'privkey' : node_privkey,
-			'tunnels' : tunnels,
-		}
-
-	return None
-
-
 def _expand_roles(node_config, role_map):
 	roles = node_config.get('roles', [])
 
@@ -360,7 +287,6 @@ class Nacl (object):
 						'ifaces_down_ok' : _get_allowed_down_OSPF_interfaces(nodes, minion_id, self.config.get ('DNS', {}).get ('infra_domain')),
 					},
 				},
-				'wireguard' : _generate_wireguard_config (nodes, minion_id),
 			}
 
 			nodes[minion_id].update (generated_config)

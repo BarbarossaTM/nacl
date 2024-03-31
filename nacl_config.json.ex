@@ -32,5 +32,8 @@
 	},
 
 	"modules": [
+		{
+			"name": "wireguard"
+		}
 	]
 }
