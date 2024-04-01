@@ -33,6 +33,9 @@
 
 	"modules": [
 		{
+			"name": "ibgp_peers"
+		},
+		{
 			"name": "wireguard"
 		}
 	]

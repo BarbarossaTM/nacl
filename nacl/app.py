@@ -3,11 +3,7 @@
 # Maximilian Wilhelm <max@rfc2324.org>
 #  --  Fri 15 Feb 2019 09:04:27 PM CET
 #
-
-import ipaddress
 import json
-import os
-import re
 
 from nacl.common import *
 from nacl.errors import NaclError
@@ -65,68 +61,6 @@ def _remove_private_keys (node, node_config):
 		del node_config['wireguard']['privkey']
 	except KeyError:
 		pass
-
-
-def _generate_ibgp_peers (nodes, node_id):
-	peers = {
-		'4': [],
-		'6': [],
-	}
-
-	AFs = []
-
-	our_roles = nodes[node_id].get ('roles', [])
-	# If we aren't a router there's nothing to do here
-	if not 'router' in our_roles:
-		return None
-
-	# Check which AFs we support (for what AFs we have a primary/loopback IP)
-	for af in [ "4", "6" ]:
-		if af in nodes[node_id]['primary_ips']:
-			AFs.append (af)
-
-	# If we don't support any AF, there's nothing to be done here
-	if not AFs:
-		return None
-
-	for node in sorted (nodes.keys ()):
-		if node == node_id:
-			continue
-
-		peer_node_config = nodes[node]
-
-		# If the remote node isn't a router nor a core-switch, it won't be a peer
-		peer_roles = peer_node_config.get ('roles', [])
-		peer_role = peer_node_config.get ('role', "")
-		if not 'router' in peer_roles and 'core-switch' != peer_role:
-			continue
-
-		# Carry on if neither we nor the peer are a RR
-		if 'routereflector' not in our_roles and 'routereflector' not in peer_roles:
-			continue
-
-		# Don't try to set up sessions to VMs/devices which are "planned", "failed", "decomissioning" and "inventory"
-		if peer_node_config.get ('status', '') not in [ '', 'active', 'staged', 'offline' ]:
-			continue
-
-		for af in AFs:
-			# Only generate a session for this AF if the peer has a primary IP for it
-			if af not in peer_node_config['primary_ips']:
-				continue
-
-			peer_config = {
-				# mangle . and - to _ to make bird happy
-				'node' : node,
-				'ip' : peer_node_config['primary_ips'][af].split ('/')[0],
-				'rr_client' : False,
-			}
-
-			if 'routereflector' in our_roles and not 'routereflector' in peer_roles:
-				peer_config['rr_client'] = True
-
-			peers[af].append (peer_config)
-
-	return peers
 
 
 def _expand_roles(node_config, role_map):
@@ -273,16 +207,10 @@ class Nacl (object):
 		for node_config in nodes.values():
 			_expand_roles(node_config, self.config.get("role_map", {}))
 
-		self.module_manager.run_modules(nodes, minion_id)
 
 		if minion_id in nodes:
 			generated_config = {
 				'routing' : {
-					'bgp' : {
-						'internal' : {
-							'peers' : _generate_ibgp_peers (nodes, minion_id),
-						},
-					},
 					'ospf' : {
 						'ifaces_down_ok' : _get_allowed_down_OSPF_interfaces(nodes, minion_id, self.config.get ('DNS', {}).get ('infra_domain')),
 					},
@@ -290,5 +218,8 @@ class Nacl (object):
 			}
 
 			nodes[minion_id].update (generated_config)
+
+		# Run any configured modules to derive and generate dynamic bits of the configuration.
+		self.module_manager.run_modules(nodes, minion_id)
 
 		return NaclResponse (nodes)
