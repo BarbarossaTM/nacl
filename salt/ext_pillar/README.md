@@ -1,6 +1,6 @@
 # NACL ext_pillar module
 
-NACL is ment to be used as a middle layer between Salt and Netbox.
+NACL is meant to be used as a middle layer between Salt Stack and Netbox.
 The architecture consists of the NACLd which will query all relevant data from
 Netbox and mangle (and cache) it so that is's usefull from a Salt point of view.
 
@@ -13,7 +13,7 @@ within the modules directory (e.g. */srv/salt/modules/pillar*).
 Place the nacl.py file in the *pillar* subdirectory.
 
 Now edit the */etc/salt/master* configuration file and uncomment the *extension_modules*
-config item (if no present already, then use the configure path ;-)).
+config item (if not present already, then use the configure path ;-)).
 
     # Directory for custom modules. This directory can contain subdirectories for
     # each of Salt's module types such as "runners", "output", "wheel", "modules",
