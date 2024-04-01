@@ -33,6 +33,9 @@
 
 	"modules": [
 		{
+			"name": "ospf_interfaces"
+		},
+		{
 			"name": "ibgp_peers"
 		},
 		{
