@@ -4,6 +4,7 @@
 #  --  Fri 15 Feb 2019 09:04:27 PM CET
 #
 import json
+import logging
 
 from nacl.common import *
 from nacl.errors import NaclError
@@ -84,25 +85,32 @@ def _read_config (config_file):
 
 
 class Nacl (object):
-	def __init__ (self, config_file, logger, enable_cache):
+	def __init__(self, config_file: str, logger: logging.Logger, enable_cache: bool):
 		self.log = logger
 		self.endpoints = endpoints
+		self.cache_enabled = enable_cache
 
 		self.config = _read_config(config_file)
-
-		self.module_manager = nacl.modules.ModuleManager(self.config, logger)
-
-		self.netbox = nacl.netbox.Netbox (self.config['netbox'], self.config.get ('defaults', {}))
+		self.module_manager = nacl.modules.ModuleManager(self, logger)
+		self.netbox = nacl.netbox.Netbox(self.config['netbox'], self.config.get ('defaults', {}))
 
 		if enable_cache:
-			self.netbox_cache = nacl.cache.NaclCacheObject ("NetBox", logger, self.netbox.get_nodes, 60)
-			self.get_nodes_func = self.netbox_cache.get_data
-		else:
-			self.get_nodes_func = self.netbox.get_nodes
+			self.nodes_cache = nacl.cache.NaclCacheObject("NetBox", logger, self.netbox.get_nodes, 60)
 
-
-	def get_endpoints (self):
+	def get_endpoints(self):
 		return self.endpoints
+
+	def get_config(self) -> dict:
+		"""Return the NACL configuration dictionary."""
+		return self.config
+
+	def get_nodes(self) -> dict:
+		"""Return a dictionary containing information about all known nodes."""
+		if self.cache_enabled:
+			return self.nodes_cache.get_data()
+
+		return self.netbox.get_nodes()
+
 
 	#
 	# Endpoints
@@ -147,7 +155,7 @@ class Nacl (object):
 
 
 	def get_pillar_info (self, minion_id):
-		nodes = self.get_nodes_func ()
+		nodes = self.get_nodes ()
 
 		# Filter out any private keys which are not for <minion_id>
 		for node, node_config in nodes.items ():
