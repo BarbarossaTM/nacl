@@ -13,7 +13,7 @@ from nacl.errors import ConfigError, ModuleError
 class BaseModule:
     """ The NACL BaseModule - all modules need to inherit this."""
 
-    def __init__(self, module_name: str, module_params: dict, nacl_config: dict, logger: logging.Logger):
+    def __init__(self, module_name: str, module_params: dict, nacl_obj, logger: logging.Logger):
         """ Set up a NACL Module.
 
         Parameters
@@ -22,14 +22,15 @@ class BaseModule:
                 The name of this module.
             modules_params: dict
                 The 'params' section from the module's dict in NACL's configuration (empty dict if not present).
-            nacl_config: dict
-                The whole NACL configuration, for access to global configuration directives (e.g. DNS).
+            nacl_obj: nacl.app.Nacl
+                The instanciated Nacl App this module is being run from, can be used to query further details.
             logger: logging.Logger:
                 A logger to be used by this module.
         """
         self._name = module_name
         self.params = module_params
-        self.nacl_config = nacl_config
+        self.nacl = nacl_obj
+        self.nacl_config = self.nacl.get_config()
         self.log = logger
 
         self.log.info(f"Initializing module {self._name}...")
@@ -72,18 +73,18 @@ class BaseModule:
 
 
 class ModuleManager:
-    def __init__(self, nacl_config: dict, logger: logging.Logger):
+    def __init__(self, nacl_obj, logger: logging.Logger):
         """ Set up a new ModuleManager with the given modules_config and logger.
 
         Parameters
         ----------
-            nacl_config: dict
-                Dictionary containing the NACL configuration. The 'modules' section is used to set up modules, and the full configuration is passed to each module.
+            nacl_obj: nacl.app.Nacl
+                The instanciated Nacl App this is being run from, can be used to query further details.
             logger: logging.Logger
                 A logging.Logger object which the ModuleManager and Modules shall use for logging.
         """
-        self.modules_config = nacl_config.get('modules', [])
-        self.nacl_config = nacl_config
+        self.nacl = nacl_obj
+        self.modules_config = nacl_obj.get_config().get('modules', [])
         self.log = logger
 
         self._modules = []
@@ -120,7 +121,7 @@ class ModuleManager:
 
         # Instanciate module
         try:
-            module_obj = python_module.Module(module_name, module_params, self.nacl_config, self.log)
+            module_obj = python_module.Module(module_name, module_params, self.nacl, self.log)
         except AttributeError as e:
             raise ModuleError(f"module {module_name}: Missing 'Module' class? - {str(e)}")
         except ConfigError as e:

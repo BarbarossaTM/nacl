@@ -45,7 +45,7 @@ class Module(BaseModule):
             A return value of None may be used to indicate that no configuration has been generated.
         """
         node_config = nodes[minion_id]
-        infra_domain = self.nacl_config.get('DNS', {}).get('infra_domain')
+        infra_domain = self.nacl.get_config().get('DNS', {}).get('infra_domain')
         ifaces_down_OK = []
 
         for ifname in sorted(node_config['ifaces'].keys()):
