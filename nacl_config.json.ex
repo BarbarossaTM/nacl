@@ -40,6 +40,9 @@
 		},
 		{
 			"name": "wireguard"
+		},
+		{
+			"name": "dhcp_server"
 		}
 	]
 }
