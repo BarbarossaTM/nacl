@@ -96,6 +96,7 @@ class Nacl (object):
 
 		if enable_cache:
 			self.nodes_cache = nacl.cache.NaclCacheObject("NetBox", logger, self.netbox.get_nodes, 60)
+			self.prefixes_cache = nacl.cache.NaclCacheObject("NetBox prefixes", logger, self.netbox.get_prefixes, 60)
 
 	def get_endpoints(self):
 		return self.endpoints
@@ -110,6 +111,13 @@ class Nacl (object):
 			return self.nodes_cache.get_data()
 
 		return self.netbox.get_nodes()
+
+	def get_prefixes(self) -> list[dict]:
+		"""Get a list of all known prefixes."""
+		if self.cache_enabled:
+			return self.prefixes_cache.get_data()
+
+		return self.netbox.get_prefixes()
 
 
 	#

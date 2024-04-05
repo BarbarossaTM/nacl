@@ -6,12 +6,11 @@
 
 import copy
 import ipaddress
-import json
 import re
 import requests
-import sys
 
 from nacl.errors import *
+import nacl.netboxhelpers as nbh
 
 path_map = {
 	'device' : 'dcim/devices',
@@ -181,7 +180,7 @@ class Netbox (object):
 
 	def _validate_device_type (self, device_type):
 		if device_type not in path_map:
-			raise NetboxError ("Invalid device_type '%s'" % device_id)
+			raise NetboxError ("Invalid device_type %s" % device_type)
 
 
 	#
@@ -399,7 +398,7 @@ class Netbox (object):
 		for vm in vms:
 			if vm in nodes:
 				# XXX Is this possible? XXX
-				raise NetboxError ("VM '%s' clashes with device of the same name!" % name)
+				raise NetboxError ("VM %s clashes with device of the same name!" % vm["name"])
 
 			nodes[vm] = vms[vm]
 
@@ -1033,3 +1032,12 @@ class Netbox (object):
 			}
 
 		return location_info
+
+	def get_prefixes(self):
+		ret = []
+
+		res = self._query("ipam/prefixes/?limit=0")
+		for nb_pfx in res:
+			ret.append(nbh.strip_prefix(nb_pfx))
+
+		return ret
