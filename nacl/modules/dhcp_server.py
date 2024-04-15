@@ -15,6 +15,12 @@ DHCP_SERVER_ROLES = [
     "batman_gw",
     "dhcp-server",
     "edge_router",
+    "l3-access",
+]
+
+DHCP_PREFIX_ROLES = [
+    "l3-access",
+    "mgmt",
 ]
 
 # Prefix attributes to copy over from a prefix queried from NetBox/Nacl
@@ -31,7 +37,8 @@ def prefix_is_relevant(pfx: dict, minion_id: str) -> bool:
     if pfx["family"] != 4:
         return False
 
-    if not pfx.get("dhcp_enabled", False):
+    # Only render configuration for 'active' and 'deprecated' prefixes
+    if pfx["status"] in ["container", "reserved"]:
         return False
 
     # If the prefix is the sub-prefix from a prefix used within a B.A.T.M.A.N. instance
@@ -43,7 +50,13 @@ def prefix_is_relevant(pfx: dict, minion_id: str) -> bool:
 
         return False
 
-    return True
+    if pfx.get("dhcp_enabled"):
+        return True
+
+    if pfx.get("role") in DHCP_PREFIX_ROLES:
+        return True
+
+    return False
 
 def our_IP_in_prefix(pfx: ipaddress.ip_network, ifaces: dict) -> Optional[Tuple[str,str]]:
     """Check all interface IPs if they are part of the given prefix and return the IP, if so.
@@ -216,6 +229,7 @@ class Module(BaseModule):
         new_pfx = dhcp_prefixes.get(str(pfx_obj.network_address))
         if not new_pfx:
             new_pfx = new_prefix(pfx_obj, our_ip, nb_pfx)
+            new_pfx["authoritative"] = False
 
         # Each B.A.T.M.A.N. prefix SHOULD have a DHCP range set, log a warning if it doesn't.
         range = nb_pfx.get("dhcp_range")
