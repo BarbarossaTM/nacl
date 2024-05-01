@@ -77,6 +77,9 @@ class Module(BaseModule):
 
         our_roles = node.get ("roles", [])
 
+        # The list of names of peers which are OK to be down, as their status isn't active.
+        peers_down_OK = set()
+
         for peer_node in sorted (nodes.keys ()):
             if peer_node == minion_id:
                 continue
@@ -94,8 +97,11 @@ class Module(BaseModule):
                 continue
 
             # Don't try to set up sessions to VMs/devices which are "planned", "failed", "decomissioning" and "inventory"
-            if peer_node_config.get ("status", "") not in [ "", "active", "staged", "offline" ]:
+            peer_status = peer_node_config.get ("status", "")
+            if peer_status not in [ "", "active", "staged", "offline" ]:
                 continue
+            if peer_status not in [ "", "active"]:
+                peers_down_OK.add(peer_node)
 
             for af in AFs:
                 # Only generate a session for this AF if the peer has a primary IP for it
@@ -103,7 +109,7 @@ class Module(BaseModule):
                     continue
 
                 peer_config = {
-                    # mangle . and - to _ to make bird happy
+                    # The template needs to mangle . and - to _ to make bird happy
                     "node" : peer_node,
                     "ip" : peer_node_config["primary_ips"][af].split("/")[0],
                     "rr_client" : False,
@@ -113,6 +119,8 @@ class Module(BaseModule):
                     peer_config["rr_client"] = True
 
                 peers[af].append (peer_config)
+
+        peers["down_OK"] = sorted(list(peers_down_OK))
 
         return {
             "routing.bgp.internal.peers" : peers,
