@@ -699,7 +699,6 @@ class Netbox (object):
 				match = ospf_cost_re.search (tag)
 				if match:
 					iface['ospf'] = {
-						'stub' : False,
 						'cost' : match.group (1)
 					}
 
