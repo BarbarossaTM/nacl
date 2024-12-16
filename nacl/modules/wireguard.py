@@ -10,6 +10,11 @@ import re
 
 from nacl.modules import BaseModule, ModuleError
 
+base_ports = {
+    "wg" : 50000,
+    "oob" : 51000,
+}
+
 class Module(BaseModule):
     def should_run(self, node_config) -> bool:
         """Returns whether this module should run for the given node_config.
@@ -82,11 +87,17 @@ class Module(BaseModule):
             # Calculate Wireguard port based on the IPv6 subnet assigned to the tunnel.
             # We use 2a03:2260:2342:fd00::/56 for all VPN PTP links and just use the 8 bits
             # from /56 to /64 as index and 52000 as base.
+            try:
+                base_port = base_ports[iface.split("-")[0]]
+            except KeyError:
+                raise ModuleError(f"No base port found for interface {iface}")
+
             port = None
             for ip_cidr in iface_cfg['prefixes']:
                 ip = ipaddress.ip_address(ip_cidr.split('/')[0])
                 if ip.version == 6:
-                    port = 50000 + int(str(ip).split(':')[3].replace ('fd',''), 16)
+                    port = base_port + int(str(ip).split(':')[3][2:], 16)
+                    break
 
             if not port:
                 continue
@@ -104,12 +115,22 @@ class Module(BaseModule):
             if local_match and peer_match and int(local_match.group (1)) < int(peer_match.group (1)):
                 mode = 'server'
 
+            # By default our tunnels are established via VRF external, which we
+            # target via the fwmark of 0x1023. For OOBM VPNs we want to use a
+            # different VRF (vrf_oobm_ext), which we can target via fwmark 0x1101.
+            # OOBM VPNs only need to use vrf_oobm_ext on the client device and use
+            # the regular external VRF on the server side.
+            fwmark = "0x1023"
+            if mode == 'client' and iface.startswith('oob-'):
+                fwmark = "0x1101"
+
             tunnels[iface] = {
                 "peer_fqdn" : peer_fqdn,
                 "peer_pubkey" : peer_pubkey,
                 "peer_ip" : peer_ip,
                 "port" : port,
                 "mode" : mode,
+		"fwmark" : fwmark,
             }
 
         if tunnels:
